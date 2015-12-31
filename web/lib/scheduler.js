@@ -9,6 +9,13 @@ export default class Scheduler {
 
         this.schedule = [];
         this.waterUntil = 0;
+        this.valveController.on('setOpen',function({source}) {
+            // manually setting the valve disables any
+            // scheduled waterings
+            if (source !== 'scheduler') {
+                this.waterUntil = 0;
+            }
+        });
     }
     start() {
         this.check();
@@ -21,9 +28,7 @@ export default class Scheduler {
            }
            if (!value) {
                 this.schedule = [];
-                this.waterUntil = 0;
            } else {
-                this.waterUntil = value.waterUntil;
                 this.schedule = value.items;
            }
         });
@@ -52,6 +57,7 @@ export default class Scheduler {
         });
 
         const checkValve = () => {
+            if (!this.waterUntil) return;
             this.valveController.setOpen(this.waterUntil > now.getTime(),'scheduler',err => {
                if (err) {
                     this.logger.error(`Unable to set valve status ${err.stack}`);
@@ -62,7 +68,6 @@ export default class Scheduler {
 
         if (updated) {
             this.storage.setItem('schedule',{ 
-                waterUntil: this.waterUntil,
                 items: this.schedule 
             },err => {
                 if (err) {
