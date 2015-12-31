@@ -27,3 +27,11 @@ export const HOMEKIT_PINCODE = '031-45-154';
 export const MANUFACTURER = 'Glenn Conner';
 export const MODEL = 'Rev 1';
 export const SERIAL = '0001';
+
+export const SETTINGS_KEY = 'settings';
+export const SCHEDULE_KEY = 'schedule';
+export const HISTORY_KEY = 'history';
+export const WEB_USER = 'web user';
+export const SCHEDULER = 'scheduler';
+export const HOMEKIT_USER = 'HomeKit user';
+export const SCHEDULE_CHECK_INTERVAL = 30000;

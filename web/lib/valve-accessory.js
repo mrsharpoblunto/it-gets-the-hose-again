@@ -21,7 +21,7 @@ export default function(valveController) {
         .addService(hap.Service.Switch,'It gets the hose again')
         .getCharacteristic(hap.Characteristic.On)
         .on('set',function(value,cb) {
-            valveController.setOpen(!!value,'homekit user',cb);
+            valveController.setOpen(!!value,config.HOMEKIT_USER,cb);
         });
 
     valve
@@ -32,7 +32,7 @@ export default function(valveController) {
         });
 
    valveController.on('setOpen',function({open,source}) {
-        if (source !== 'homekit user') {
+        if (source !== config.HOMEKIT_USER) {
             valve
                 .getService(hap.Service.Switch)
                 .setCharacteristic(hap.Characteristic.On,open ? 1 : 0);

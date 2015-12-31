@@ -1,4 +1,5 @@
 import uuid from 'node-uuid';
+import * as config from './config';
 import * as clientConfig from './client-config';
 
 export default function(app) {
@@ -40,7 +41,7 @@ export default function(app) {
     });
 
     app.post('/api/1/toggle-valve',(req,res) => {
-        app.valveController.toggleOpen('web user',(err,open) => {
+        app.valveController.toggleOpen(config.WEB_USER,(err,open) => {
             if (err) {
                 return res.status(500).json({
                     success: false
@@ -54,9 +55,9 @@ export default function(app) {
     });
 
     app.get('/api/1/history',(req,res) => {
-        app.storage.getItem('history', (err,value) => {
+        app.storage.getItem(config.HISTORY_KEY, (err,value) => {
             if (err) {
-               app.logger.error(`Unable to get history items ${err.stack}`); 
+               app.logger.error(`Unable to get history items - ${err.stack}`); 
                res.status(500).json({ success: false });
             }
             else if (!value) {
@@ -80,41 +81,32 @@ export default function(app) {
     });
 
     app.get('/api/1/schedule',(req,res) => {
-        app.storage.getItem('schedule', (err,value) => {
+        app.storage.getItem(config.SCHEDULE_KEY, (err,value) => {
             if (err) {
-               app.logger.error(`Unable to get schedule items ${err.stack}`); 
-               res.status(500).json({ success: false });
+               app.logger.error(`Unable to get schedule items - ${err.stack}`); 
+               return res.status(500).json({ success: false });
             }
-            else if (!value) {
-                res.json({
-                    items: [],
-                    success: true
-                });
-            } else {
-                res.json({
-                    items: value.items,
-                    success: true
-                });
-            }
+            res.json({
+                items: value ? value.items : [],
+                success: true
+            });
         });
     });
 
     app.delete('/api/1/schedule/:id',(req,res) => {
-        app.storage.getItem('schedule', (err,value) => {
+        app.storage.getItem(config.SCHEDULE_KEY, (err,value) => {
             if (err) {
-               app.logger.error(`Unable to get schedule items ${err.stack}`); 
+               app.logger.error(`Unable to get schedule items - ${err.stack}`); 
                return res.status(500).json({ success: false });
             }
-            if (!value) {
-                value = {
-                    items: []
-                };
-            }
+            value = value || {
+                items: []
+            };
 
             value.items = value.items.filter(item => {
                 return item.id !== req.params.id
             });
-            app.storage.setItem('schedule',value,err => {
+            app.storage.setItem(config.SCHEDULE_KEY,value,err => {
                 if (err) {
                    app.logger.error(`Unable to set schedule items ${err.stack}`); 
                    return res.status(500).json({ success: false });
@@ -163,21 +155,19 @@ export default function(app) {
             frequency: req.body.frequency
         };
 
-        app.storage.getItem('schedule', (err,value) => {
+        app.storage.getItem(config.SCHEDULE_KEY, (err,value) => {
             if (err) {
-               app.logger.error(`Unable to get schedule items ${err.stack}`); 
+               app.logger.error(`Unable to get schedule items - ${err.stack}`); 
                return res.status(500).json({ success: false });
             }
-            if (!value) {
-                value = {
-                    items: [],
-                    waterUntil: 0
-                };
-            }
+            value = value || {
+                items: [],
+                waterUntil: 0
+            };
             value.items.push(newItem);
-            app.storage.setItem('schedule',value,err => {
+            app.storage.setItem(config.SCHEDULE_KEY,value,err => {
                 if (err) {
-                   app.logger.error(`Unable to set schedule items ${err.stack}`); 
+                   app.logger.error(`Unable to set schedule items - ${err.stack}`); 
                    return res.status(500).json({ success: false });
                 }
                 app.scheduler.reload();
@@ -185,6 +175,53 @@ export default function(app) {
                     success: true,
                     newItem
                 });
+            });
+        });
+    });
+
+    app.get('/api/1/settings',(req,res) => {
+        app.storage.getItem(config.SETTINGS_KEY,(err,settings) => {
+            if (err) {
+                app.logger.error(`Unable to get schedule items - ${err.stack}`); 
+                return res.status(500).json({ success: false });
+            }
+            res.json({
+                success: true,
+                settings: settings || {
+                    shutoffDuration: 0                     
+                }
+            });
+        });
+    });
+
+    app.post('/api/1/settings',(req,res) => {
+        if (!req.body) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'expected JSON body in request'
+            });
+        }
+
+        if (typeof(req.body.shutoffDuration) !== 'number' || req.body.shutoffDuration < 0 || req.body.duration >= 60) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Required field "shutoffDuration" not present or is not a Number between 0 and 60'
+            });
+        }
+        
+        const settings = {
+            shutoffDuration: req.body.shutoffDuration
+        };
+
+        app.storage.setItem(config.SETTINGS_KEY,settings,err => {
+            if (err) {
+                app.logger.error(`Unable to apply settings - ${err.stack}`); 
+                return res.status(500).json({ success: false });
+            }
+            app.scheduler.reload();
+            res.json({
+                success: true,
+                settings
             });
         });
     });

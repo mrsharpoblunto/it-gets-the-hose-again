@@ -1,3 +1,5 @@
+import * as config from './config';
+
 export default class HistoryLogger {
     constructor(storage,logger,maxItems) {
         this.storage = storage;
@@ -5,7 +7,7 @@ export default class HistoryLogger {
         this.maxItems = maxItems;
     }
     write(source,message,cb) {
-        this.storage.getItem('history',(err,value) => {
+        this.storage.getItem(config.HISTORY_KEY,(err,value) => {
             if (err) {
                 this.logger.error('Unable to get history items');
                 return cb(err);
@@ -26,7 +28,7 @@ export default class HistoryLogger {
             }
             value.items.unshift(newItem);
 
-            this.storage.setItem('history',value,err => {
+            this.storage.setItem(config.HISTORY_KEY,value,err => {
                 if (err) {
                     this.logger.error('Unable to set history items');
                     return cb(err);

@@ -40,6 +40,7 @@ export default class ScheduleComponent extends React.Component {
     render() {
         return !this.props.initialized ? <Loading /> : (
             <div className='row'>
+                <h3>Schedule</h3>
                 {this.props.items.length ? (
                 <div className='col s12'>
                     <table className='highlight bordered'>

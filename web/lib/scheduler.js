@@ -1,4 +1,4 @@
-const CHECK_INTERVAL = 30000;
+import * as config from './config';
 
 export default class Scheduler {
     constructor(storage,history,logger,valveController) {
@@ -6,34 +6,64 @@ export default class Scheduler {
         this.history = history;
         this.logger = logger;
         this.valveController = valveController;
-
+        this.settings = {};
         this.schedule = [];
         this.waterUntil = 0;
-        this.valveController.on('setOpen',function({source}) {
-            // manually setting the valve disables any
-            // scheduled waterings
-            if (source !== 'scheduler') {
-                this.waterUntil = 0;
-            }
-        });
     }
+
     start() {
-        this.check();
-    }
-    reload() {
-        this.logger.info('Restarting scheduler...');
-        this.storage.getItem('schedule',(err,value) => {
-           if (err) {
-                return this.logger.error(`Unable to reload schedule ${err.stack}`);
-           }
-           if (!value) {
-                this.schedule = [];
-           } else {
-                this.schedule = value.items;
-           }
+        this.logger.info('Scheduler starting...');
+        this._load(() => {
+            this.valveController.on('setOpen',({open,source}) => {
+                if (source !== config.SCHEDULER) {
+                    if (open && this.settings.shutoffDuration) {
+                        // ensure that if we manually opened the valve
+                        // that it shuts off after a specified amount
+                        // of time (if configured)
+                        this.waterUntil = (new Date()).getTime() + (this.settings.shutoffDuration * 60 * 1000);
+                    } else {
+                        // manually setting the valve disables any
+                        // scheduled waterings
+                        this.waterUntil = 0;
+                    }
+                }
+            });
+            this._check();
+            this.checkHandle = setInterval(this._check,config.SCHEDULE_CHECK_INTERVAL);
+            this.logger.info('Scheduler running');
         });
     }
-    check = () => {
+
+    stop() {
+        clearInterval(this.checkHandle);
+    }
+
+    reload() {
+        this._load(() => {
+            this.logger.info('Scheduler reloaded');
+        });
+    }
+
+    _load(cb) {
+        this.storage.getItem(config.SETTINGS_KEY,(err,settings) => {
+            if (err) {
+                this.logger.error(`Unable to load settings ${err.stack}`);
+            }
+            this.settings = settings || {};
+
+            this.storage.getItem(config.SCHEDULE_KEY,(err,schedule) => {
+               if (err) {
+                    this.logger.error(`Unable to load schedule ${err.stack}`);
+               }
+               this.schedule = schedule ? schedule.items : [];
+               if (cb) {
+                    cb();
+               }
+            });
+        });
+    }
+
+    _check = () => {
         const now = new Date();
         const currentHour = now.getHours(); 
         this.logger.verbose(`Checking schedule for hour ${currentHour}`);
@@ -45,42 +75,41 @@ export default class Scheduler {
             // don't start new tasks if we're more than 5 minutes
             // past the hour
             && now.getMinutes() < 5) {
-                item.nextRun = this.startOfDay(now) + ((86400 * item.frequency) + (3600 * item.time)) * 1000;
+                item.nextRun = this._startOfDay(now) + ((86400 * item.frequency) + (3600 * item.time)) * 1000;
                 this.logger.verbose(`Schedule item will run - next run ${item.nextRun}`);
                 const nextWater = now.getTime() + (item.duration * 60 * 1000);
                 if (nextWater > this.waterUntil) {
                     this.logger.verbose(`Will water until ${nextWater}`);
                     this.waterUntil = nextWater;
-                    updated = true;
                 }
+                updated = true;
             }
         });
 
-        const checkValve = () => {
-            if (!this.waterUntil) return;
-            this.valveController.setOpen(this.waterUntil > now.getTime(),'scheduler',err => {
-               if (err) {
-                    this.logger.error(`Unable to set valve status ${err.stack}`);
-                }
-                setTimeout(this.check,CHECK_INTERVAL);
-            });
-        }
-
         if (updated) {
-            this.storage.setItem('schedule',{ 
+            this.storage.setItem(config.SCHEDULE_KEY,{ 
                 items: this.schedule 
             },err => {
                 if (err) {
                     return this.logger.error(`Unable to update schedule ${err.stack}`);
                 }
-                checkValve();
+                this._checkValve(now);
             });
         } else {
-            checkValve();
+            this._checkValve(now);
         }
     }
-    startOfDay(now) {
-        return (new Date(now.getFullYear(),now.getMonth(),now.getDate())).getTime();
+
+    _checkValve(now) {
+        if (!this.waterUntil) return;
+        this.valveController.setOpen(this.waterUntil > now.getTime(),config.SCHEDULER,err => {
+           if (err) {
+                this.logger.error(`Unable to set valve status ${err.stack}`);
+            }
+        });
     }
 
+    _startOfDay(now) {
+        return (new Date(now.getFullYear(),now.getMonth(),now.getDate())).getTime();
+    }
 }

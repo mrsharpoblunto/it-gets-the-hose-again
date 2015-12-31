@@ -69,7 +69,6 @@ app.scheduler = new Scheduler(
     app.history,
     app.logger,
     app.valveController);
-app.scheduler.reload();
 app.scheduler.start();
 
 configureApiRoutes(app);
