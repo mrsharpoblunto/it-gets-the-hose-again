@@ -5,7 +5,7 @@ module.exports = {
     debug: false,
     entry: {
         app: __dirname + '/assets/js/app.js',
-        vendor: ['react','react-dom','redux','react-redux','redux-logger','redux-thunk','superagent','moment','jquery','materialize-css']
+        vendor: ['react','react-dom','redux','react-redux','redux-logger','redux-thunk','superagent','moment']
     },
     output: {
         path: path.join(__dirname,'public'),
@@ -21,15 +21,16 @@ module.exports = {
         new webpack.optimize.CommonsChunkPlugin('vendor','vendor.js')
     ],
     resolve: {
-        extensions: [ '','.js','.jsx'],
-        alias: {
-            'jQuery':'jquery'
-        }
+        extensions: [ '','.js','.jsx']
     },
     module: {
         loaders: [
             { test: /\.jsx?$/, loaders: ['babel?stage=0&optional=runtime'], exclude: /node_modules/ }
         ],
-        noParse: [/moment/,/jquery/]
+        noParse: [/moment/]
+    },
+    externals: {
+        '$': 'window.$',
+        'jQuery': 'window.jQuery'
     }
 };

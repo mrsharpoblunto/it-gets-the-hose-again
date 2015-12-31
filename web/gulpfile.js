@@ -13,8 +13,11 @@ var gulp = require('gulp'),
     webpack = require('webpack'),
     del = require('del'),
     fs = require('fs'),
+    os = require('os'),
+    path = require('path'),
     webpackDevServer = require('webpack-dev-server'),
     eslint = require('gulp-eslint'),
+    exec = require('child_process').exec,
     Restartable = require('restartable-process');
 
 // build configuration
@@ -60,6 +63,16 @@ gulp.task('vendor-styles', function() {
         .pipe(concat('vendor.css'))
         .pipe(minifycss())
         .pipe(gulp.dest('public/css'));
+});
+
+gulp.task('jquery-scripts', function() {
+    return gulp.src([
+        'node_modules/jquery/dist/jquery.min.js',
+        'node_modules/materialize-css/dist/js/materialize.min.js'
+    ])
+        .pipe(newer('public/vendor-jquery.js'))
+        .pipe(concat('vendor-jquery.js'))
+        .pipe(gulp.dest('public'));
 });
 
 gulp.task('webpack', function(callback) {
@@ -141,7 +154,7 @@ gulp.task('clean', function(cb) {
     });
 });
 
-gulp.task('build-common',['styles','vendor-styles','images','fonts','html','lint']);
+gulp.task('build-common',['styles','vendor-styles','jquery-scripts','images','fonts','html','lint']);
 
 // external tasks
 gulp.task('build',['build-common','webpack']);

@@ -27,3 +27,5 @@ build/Release
 node_modules
 
 web/public
+web/ssl
+web/persist

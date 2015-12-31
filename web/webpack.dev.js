@@ -2,11 +2,11 @@ var webpack = require('webpack');
 var path = require('path');
 
 module.exports = {
-    devtool: 'eval-source-map',
+    devtool: 'source-map',
     debug: true,
     entry: {
         app: [__dirname + '/assets/css/app.css','webpack-dev-server/client?','webpack/hot/dev-server',__dirname + '/assets/js/app.js'],
-        vendor: ['react','redux','react-redux','redux-logger','redux-thunk','react-dom','superagent','moment','jquery','materialize-css']
+        vendor: ['react','redux','react-redux','redux-logger','redux-thunk','react-dom','superagent','moment']
     },
     output: {
         path: path.join(__dirname,'public'),
@@ -23,10 +23,7 @@ module.exports = {
         new webpack.optimize.CommonsChunkPlugin('vendor','vendor.js')
     ],
     resolve: {
-        extensions: [ '','.js','.jsx'],
-        alias: {
-            'jQuery':'jquery'
-        }
+        extensions: [ '','.js','.jsx']
     },
     module: {
         loaders: [
@@ -34,6 +31,10 @@ module.exports = {
             { test: /\.css$/, loader: 'style!css?importLoaders=1' }
 
         ],
-        noParse: [/moment/,/jquery/]
+        noParse: [/moment/]
+    },
+    externals: {
+        '$': 'window.$',
+        'jQuery': 'window.jQuery'
     }
 };

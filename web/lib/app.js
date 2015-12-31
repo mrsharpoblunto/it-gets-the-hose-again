@@ -1,6 +1,10 @@
 'use strict'
 import path from 'path';
 import http from 'http';
+import https from 'https';
+import fs from 'fs';
+import storage from 'node-persist';
+import hap from 'hap-nodejs';
 
 import express from 'express';
 //express middleware
@@ -11,27 +15,23 @@ import bodyParser from 'body-parser';
 import winston from 'winston';
 
 import configureApiRoutes from './api';
-
-const APP_SERVER_PORT = process.env.NODE_ENV === 'production' ? 80 : 3000;
-const MAX_AGE = '31536000';
-const PUBLIC_STATIC_CACHING = process.env.NODE_ENV === 'development' ? {} : { 
-  maxAge: MAX_AGE,
-  setHeaders: (res) => {
-    res.setHeader('Cache-Control',`public, max-age=${MAX_AGE}`);
-  }
-};
+import pwauth from './pwauth';
+import ValveController from './valve-controller';
+import Scheduler from './scheduler';
+import HistoryLogger from './history-logger';
+import * as config from './config';
 
 // configure express and its middleware
 const app = express();
 app.enable('trust proxy');
-app.set('port',APP_SERVER_PORT);
+app.set('port',config.APP_SERVER_PORT);
 app.use(compression());
 
 // configure logging
 app.logger = new (winston.Logger)({
   transports: [
     new winston.transports.Console({
-      level: process.env.NODE_ENV === 'production' ? 'error' : 'info',
+      level: config.LOG_LEVEL,
       colorize: true,
       timestamp: true
     })
@@ -42,21 +42,43 @@ app.use(morgan('combined',{ stream: {
 }}));
 
 app.use(bodyParser.json());
-if (process.env.NODE_ENV !== 'production') {
-  app.use(errorHandler({ dumpExceptions: true, showStack: true }));
+if (process.env.NODE_ENV === 'production') {
+    app.use(pwauth);
+} else {
+    app.use(errorHandler({ dumpExceptions: true, showStack: true }));
 }
 
-configureAuth(app);
-configureRoutes(app);
+// setup storage engine
+app.storage = storage;
+storage.initSync();
+
+// create the history logger
+app.history = new HistoryLogger(
+    app.storage,
+    app.logger,
+    config.MAX_HISTORY_ITEMS);
+
+// create the valve controller
+app.valveController = new ValveController(
+    app.history,
+    app.logger);
+
+// load the watering scheduler
+app.scheduler = new Scheduler(
+    app.storage,
+    app.history,
+    app.logger,
+    app.valveController);
+app.scheduler.reload();
+app.scheduler.start();
+
 configureApiRoutes(app);
+configureRoutes(app);
+startHomekitServer(app);
 startServer(app);
 
-function configureAuth(app) {
-    // TODO set up http basic auth authenticating from pwauth
-}
-
 function configureRoutes(app) {
-  app.use(express.static(path.join(__dirname,'..','public'),PUBLIC_STATIC_CACHING));
+  app.use(express.static(path.join(__dirname,'..','public'),config.PUBLIC_STATIC_CACHING));
 
   /**
    * when running in dev mode without using the webpack-dev-server, we don't want
@@ -79,10 +101,21 @@ function configureRoutes(app) {
   });
 }
 
+function startHomekitServer(app) {
+   hap.init();
+   const accessory = require('./valve-accessory')(app.valveController);
+   accessory.publish({
+        port: config.HOMEKIT_PORT,
+        username: config.HOMEKIT_USERNAME,
+        pincode: config.HOMEKIT_PINCODE
+   });
+   app.logger.info('Published HomeKit Accessory Info');  
+}
+
 function startServer(app) {
-    const server = http.createServer(app)
+    const server = config.APP_HTTPS ? https.createServer(sslConfig(),app) : http.createServer(app)
     let started = false;
-    server.listen(APP_SERVER_PORT, () => {
+    server.listen(config.APP_SERVER_PORT, () => {
         app.logger.info('Express server awaiting connections');
         started = true;
     }).on('error',err=> {
@@ -90,17 +123,27 @@ function startServer(app) {
         app.logger.error(err.stack);
       }
       else if (err.code === 'EACCES') {
-        app.logger.error(`Unable to listen on port ${APP_SERVER_PORT}. This is usually due to the process not having permissions to bind to this port. Did you mean to run the server in dev mode with a non-priviledged port instead?`);
+        app.logger.error(`Unable to listen on port ${config.APP_SERVER_PORT}. This is usually due to the process not having permissions to bind to this port. Did you mean to run the server in dev mode with a non-priviledged port instead?`);
       }
       else if (err.code === 'EADDRINUSE') {
-        app.logger.error(`Unable to listen on port ${APP_SERVER_PORT} because another process is already listening on this port. Do you have another instance of the server already running?`);
+        app.logger.error(`Unable to listen on port ${config.APP_SERVER_PORT} because another process is already listening on this port. Do you have another instance of the server already running?`);
       }
     });
+}
 
-  process.on('SIGTERM', function() {
-      app.logger.info('SIGTERM received, draining connections...');
-      server.close(() => {
-        app.logger.verbose('Express server closed. Terminating process');
-      });
-  });
+function sslConfig() {
+    return {
+        cert: tryReadFileSync(path.join(__dirname,'..','ssl','server.crt')),
+        key: tryReadFileSync(path.join(__dirname,'..','ssl','server.key'))
+    };
+}
+
+function tryReadFileSync(path) {
+  try
+  {
+    return fs.readFileSync(path,'utf8');
+  }
+  catch (err) {
+    return null; 
+  }
 }
