@@ -179,17 +179,22 @@ export default function(app) {
         });
     });
 
+    function getDefaultSettings() {
+        return {
+            shutoffDuration: 0,
+            location: null
+        };
+    }
+
     app.get('/api/1/settings',(req,res) => {
         app.storage.getItem(config.SETTINGS_KEY,(err,settings) => {
             if (err) {
-                app.logger.error(`Unable to get schedule items - ${err.stack}`); 
+                app.logger.error(`Unable to get settings - ${err.stack}`); 
                 return res.status(500).json({ success: false });
             }
             res.json({
                 success: true,
-                settings: settings || {
-                    shutoffDuration: 0                     
-                }
+                settings: settings || getDefaultSettings()
             });
         });
     });
@@ -202,26 +207,47 @@ export default function(app) {
             });
         }
 
-        if (typeof(req.body.shutoffDuration) !== 'number' || req.body.shutoffDuration < 0 || req.body.duration >= 60) {
-            return res.status(400).json({ 
-                success: false,
-                message: 'Required field "shutoffDuration" not present or is not a Number between 0 and 60'
-            });
-        }
-        
-        const settings = {
-            shutoffDuration: req.body.shutoffDuration
-        };
-
-        app.storage.setItem(config.SETTINGS_KEY,settings,err => {
+        app.storage.getItem(config.SETTINGS_KEY,(err,settings) => {
             if (err) {
-                app.logger.error(`Unable to apply settings - ${err.stack}`); 
+                app.logger.error(`Unable to get settings - ${err.stack}`); 
                 return res.status(500).json({ success: false });
             }
-            app.scheduler.reload();
-            res.json({
-                success: true,
-                settings
+
+            if (!settings) {
+                settings = getDefaultSettings();
+            }
+
+            if (typeof(req.body.shutoffDuration)!=='undefined') {
+                if (typeof(req.body.shutoffDuration) !== 'number' || req.body.shutoffDuration < 0 || req.body.duration >= 60) {
+                    return res.status(400).json({ 
+                        success: false,
+                        message: 'Optional field "shutoffDuration" is not a Number between 0 and 60'
+                    });
+                }
+                settings.shutoffDuration = req.body.shutoffDuration;
+            }
+
+            if (typeof(req.body.location)!=='undefined') {
+                if (req.body.location !== null && (typeof(req.body.location.latitude) !== 'number' || typeof(req.body.location.longitude) !== 'number')) {
+                    return res.status(400).json({ 
+                        success: false,
+                        message: 'Optional field "location" is not a latitude/longitude coordinate pair'
+                    });
+                }
+                settings.location = req.body.location;
+            }
+            
+
+            app.storage.setItem(config.SETTINGS_KEY,settings,err => {
+                if (err) {
+                    app.logger.error(`Unable to apply settings - ${err.stack}`); 
+                    return res.status(500).json({ success: false });
+                }
+                app.scheduler.reload();
+                res.json({
+                    success: true,
+                    settings
+                });
             });
         });
     });

@@ -35,3 +35,5 @@ export const WEB_USER = 'web user';
 export const SCHEDULER = 'scheduler';
 export const HOMEKIT_USER = 'HomeKit user';
 export const SCHEDULE_CHECK_INTERVAL = 30000;
+
+export const OPEN_WEATHER_API_KEY = 'e8ec11f15c10f4d172cdaa13f469e45f';

@@ -1,1 +1,3 @@
 export const LONGPOLL_TIMEOUT = 30000;
+
+export const GOOGLE_MAPS_API_KEY = 'AIzaSyCzSMm4L_QrIKXCCIPG20eLjd0XoYvkjQ8';
