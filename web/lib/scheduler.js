@@ -1,3 +1,4 @@
+import superagent from './superagent-promise';
 import * as config from './config';
 
 export default class Scheduler {
@@ -93,16 +94,28 @@ export default class Scheduler {
                 if (err) {
                     return this.logger.error(`Unable to update schedule ${err.stack}`);
                 }
-                this._checkValve(now);
+                if (this.settings.location) {
+                    this._checkWeather(this.settings.location,(shouldWater,weatherDesc) => {
+                        if (!shouldWater) {
+                            this.history.write(config.SCHEDULER,`Watering cancelled due to weather conditions - ${weatherDesc}`,() => {
+                                this._setValve(false);
+                                this.waterUntil = 0;
+                            });
+                        } else {
+                            this._setValve(true);
+                        }
+                    });
+                } else {
+                    this._setValve(true);
+                }
             });
-        } else {
-            this._checkValve(now);
+        } else if (this.waterUntil) {
+            this._setValve(this.waterUntil > now.getTime());
         }
     }
 
-    _checkValve(now) {
-        if (!this.waterUntil) return;
-        this.valveController.setOpen(this.waterUntil > now.getTime(),config.SCHEDULER,err => {
+    _setValve(open) {
+        this.valveController.setOpen(open,config.SCHEDULER,err => {
            if (err) {
                 this.logger.error(`Unable to set valve status ${err.stack}`);
             }
@@ -111,5 +124,28 @@ export default class Scheduler {
 
     _startOfDay(now) {
         return (new Date(now.getFullYear(),now.getMonth(),now.getDate())).getTime();
+    }
+
+    _checkWeather(location,cb) {
+        superagent
+            .get(`http://api.openweathermap.org/data/2.5/weather?lat={location.latitude}&lon={location.longitude}&appid={config.OPEN_WEATHER_API_KEY}`)
+            .accept('json')
+            .end()
+            .then(res => {
+                // find if the code is any of the recognized weather types with rain
+                // from http://openweathermap.org/weather-conditions
+                const code = res.body.weather[0].id;
+                if ((code >= 200 && code <= 202) ||
+                    (code >= 300 && code <= 321) || 
+                    (code >= 500 && code <= 531)) {
+                    cb(false,res.body.weather[0].description);
+                } else {
+                    cb(true,null);
+                }
+            })
+            .catch(err => {
+                this.logger.error(`Unable to check weather status for current location - ${err.stack}`);
+                cb(true,null);
+            });
     }
 }

@@ -1,4 +1,5 @@
 import uuid from 'node-uuid';
+import superagent from './superagent-promise';
 import * as config from './config';
 import * as clientConfig from './client-config';
 
@@ -250,5 +251,41 @@ export default function(app) {
                 });
             });
         });
+    });
+
+    app.get('/api/1/weather',(req,res) => {
+        if (!req.query.lat) {
+            return res.json({
+                success: false,
+                message: 'Required querystring parameter "lat" not present'
+            });
+        }
+
+        if (!req.query.lon) {
+            return res.json({
+                success: false,
+                message: 'Required querystring parameter "lon" not present'
+            });
+        }
+
+        superagent
+            .get(`http://api.openweathermap.org/data/2.5/weather?lat=${req.query.lat}&lon=${req.query.lon}&appid=${config.OPEN_WEATHER_API_KEY}`)
+            .accept('json')
+            .end()
+            .then(apiRes => {
+                const weather = apiRes.body.weather[0];
+                weather.icon = `http://openweathermap.org/img/w/${weather.icon}.png`;
+                res.json({
+                    success: true,
+                    weather
+                });
+            })
+            .catch(err => {
+                app.logger.error(`Unable to get weather information - ${err.stack}`);
+                res.json({
+                    success: false,
+                    message: 'Unable to contact Open Weather API'
+                });
+            });
     });
 }

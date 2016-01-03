@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux';
 
+import superagent from '../superagent-promise';
 import * as clientConfig from '../client-config';
 import { getSettings, updateSettings } from '../actions/settings';
 import Loading from './loading';
@@ -98,8 +99,13 @@ export default class SettingsComponent extends React.Component {
                             { this.state.checkWeather ? (<a className="waves-effect waves-teal btn-flat right" style={{marginTop:'-6px'}} onClick={this.handleRefreshLocation}><i className='material-icons left'>refresh</i> Refresh</a>) : null }
                         </p>
                     </div>
-                    { this.state.checkWeather ? <UserLocationComponent location={this.state.location} onChange={this.handleChangeLocation} /> : null }
                 </div>
+                { this.state.checkWeather ?
+                (<div className='row'>
+                    <div className='col s12'>
+                        <UserLocationComponent location={this.state.location} onChange={this.handleChangeLocation} />
+                    </div>
+                </div>) : null }
             </form>
         </div>);
     }
@@ -129,6 +135,19 @@ class UserLocationComponent extends React.Component {
         });
         if (!props.location) {
             this.findLocation();
+        } else {
+            superagent
+                .get(`/api/1/weather?lat=${props.location.latitude}&lon=${props.location.longitude}`)
+                .accept('json')
+                .end()
+                .then(res => {
+                    if (res.body.success) {
+                        this.setState({ weather: res.body.weather });
+                    }
+                })
+                .catch(() => {
+                    this.setState({ weather: null });
+                });
         }
     }
     findLocation = () => {
@@ -162,11 +181,23 @@ class UserLocationComponent extends React.Component {
                 </div>
             </div>;
         } else if (!this.state.location) {
-            return <div className="progress">
-                <div className="indeterminate"></div>
+            return <div className='row'>
+                <div className='col s12'>
+                    <div className="progress">
+                        <div className="indeterminate"></div>
+                    </div>
+                </div>
             </div>;
         } else {
-            return <img style={{width:'100%',maxWidth:'100%'}}src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.state.location.latitude},${this.state.location.longitude}&zoom=15&size=1280x720&key=${clientConfig.GOOGLE_MAPS_API_KEY}`} />
+            return <div>
+                { this.state.weather ? 
+                (<div className='weather-info'>
+                    <img src={this.state.weather.icon} /> 
+                    <p className='right'>{this.state.weather.description}</p>
+                </div>)
+                : null }
+                <img style={{width:'100%',maxWidth:'100%'}}src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.state.location.latitude},${this.state.location.longitude}&zoom=15&size=1280x720&key=${clientConfig.GOOGLE_MAPS_API_KEY}`} />
+            </div>;
         }
     }
 }
