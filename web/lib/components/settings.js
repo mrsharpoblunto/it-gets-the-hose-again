@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux';
 
 import superagent from '../superagent-promise';
-import * as clientConfig from '../client-config';
+import * as keys from '../../keys';
 import { getSettings, updateSettings } from '../actions/settings';
 import Loading from './loading';
 
@@ -196,7 +196,7 @@ class UserLocationComponent extends React.Component {
                     <p className='right'>{this.state.weather.description}</p>
                 </div>)
                 : null }
-                <img style={{width:'100%',maxWidth:'100%'}}src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.state.location.latitude},${this.state.location.longitude}&zoom=15&size=1280x720&key=${clientConfig.GOOGLE_MAPS_API_KEY}`} />
+                <img style={{width:'100%',maxWidth:'100%'}}src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.state.location.latitude},${this.state.location.longitude}&zoom=15&size=1280x720&key=${keys.GOOGLE_MAPS_API_KEY}`} />
             </div>;
         }
     }

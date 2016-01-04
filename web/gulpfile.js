@@ -148,7 +148,8 @@ gulp.task('tests',['lint'], function() {
 
 gulp.task('clean', function(cb) {
     del([
-        'public/**'
+        'public/**',
+        'persist/**'
     ],function() {
         fs.mkdir('public',cb);
     });

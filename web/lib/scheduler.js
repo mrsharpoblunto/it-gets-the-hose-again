@@ -1,5 +1,6 @@
 import superagent from './superagent-promise';
 import * as config from './config';
+import * as keys from '../keys';
 
 export default class Scheduler {
     constructor(storage,history,logger,valveController) {
@@ -128,7 +129,7 @@ export default class Scheduler {
 
     _checkWeather(location,cb) {
         superagent
-            .get(`http://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=${config.OPEN_WEATHER_API_KEY}`)
+            .get(`http://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=${keys.OPEN_WEATHER_API_KEY}`)
             .accept('json')
             .end()
             .then(res => {

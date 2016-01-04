@@ -1,5 +1,6 @@
 import uuid from 'node-uuid';
 import superagent from './superagent-promise';
+import * as keys from '../keys';
 import * as config from './config';
 import * as clientConfig from './client-config';
 
@@ -269,7 +270,7 @@ export default function(app) {
         }
 
         superagent
-            .get(`http://api.openweathermap.org/data/2.5/weather?lat=${req.query.lat}&lon=${req.query.lon}&appid=${config.OPEN_WEATHER_API_KEY}`)
+            .get(`http://api.openweathermap.org/data/2.5/weather?lat=${req.query.lat}&lon=${req.query.lon}&appid=${keys.OPEN_WEATHER_API_KEY}`)
             .accept('json')
             .end()
             .then(apiRes => {
