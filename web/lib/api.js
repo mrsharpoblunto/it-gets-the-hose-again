@@ -43,7 +43,7 @@ export default function(app) {
     });
 
     app.post('/api/1/toggle-valve',(req,res) => {
-        app.valveController.toggleOpen(config.WEB_USER,(err,open) => {
+        app.valveController.toggleOpen(config.WEB_USER,(err,{open}) => {
             if (err) {
                 return res.status(500).json({
                     success: false

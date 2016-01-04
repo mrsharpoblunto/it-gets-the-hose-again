@@ -96,7 +96,7 @@ export default class SettingsComponent extends React.Component {
                         <p>
                             <input type='checkbox' id='checkWeather' className='filled-in' onChange={this.handleCheckWeather} checked={this.state.checkWeather} />
                             <label htmlFor='checkWeather'>Check weather</label>
-                            { this.state.checkWeather ? (<a className="waves-effect waves-teal btn-flat right" style={{marginTop:'-6px'}} onClick={this.handleRefreshLocation}><i className='material-icons left'>refresh</i> Refresh</a>) : null }
+                            { this.state.checkWeather ? (<a className="waves-effect weather-btn btn-flat right" onClick={this.handleRefreshLocation}><i className='material-icons left'>refresh</i> Refresh</a>) : null }
                         </p>
                     </div>
                 </div>
@@ -193,7 +193,7 @@ class UserLocationComponent extends React.Component {
                 { this.state.weather ? 
                 (<div className='weather-info'>
                     <img src={this.state.weather.icon} /> 
-                    <p className='right'>{this.state.weather.description}</p>
+                    <h5 className='right'>{this.state.weather.description}</h5>
                 </div>)
                 : null }
                 <img style={{width:'100%',maxWidth:'100%'}}src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.state.location.latitude},${this.state.location.longitude}&zoom=15&size=1280x720&key=${keys.GOOGLE_MAPS_API_KEY}`} />

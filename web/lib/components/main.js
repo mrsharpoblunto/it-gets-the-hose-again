@@ -53,7 +53,7 @@ export default class Main extends React.Component {
           { this.props.children }
           </div>
         </main>
-        <footer>
+        <footer className='center'>
         </footer>
       </div>
     );

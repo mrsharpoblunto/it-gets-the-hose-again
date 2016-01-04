@@ -2,12 +2,21 @@ import superagent from './superagent-promise';
 import * as config from './config';
 import * as keys from '../keys';
 
+function systemTimer() {
+    return {
+        now: function() {
+            return new Date();
+        }
+    };
+}
+
 export default class Scheduler {
-    constructor(storage,history,logger,valveController) {
+    constructor(storage,history,logger,valveController,timer=systemTimer()) {
         this.storage = storage;
         this.history = history;
         this.logger = logger;
         this.valveController = valveController;
+        this.timer = timer;
         this.settings = {};
         this.schedule = [];
         this.waterUntil = 0;
@@ -22,7 +31,7 @@ export default class Scheduler {
                         // ensure that if we manually opened the valve
                         // that it shuts off after a specified amount
                         // of time (if configured)
-                        this.waterUntil = (new Date()).getTime() + (this.settings.shutoffDuration * 60 * 1000);
+                        this.waterUntil = this.timer.now().getTime() + (this.settings.shutoffDuration * 60 * 1000);
                     } else {
                         // manually setting the valve disables any
                         // scheduled waterings
@@ -66,7 +75,7 @@ export default class Scheduler {
     }
 
     _check = () => {
-        const now = new Date();
+        const now = this.timer.now();
         const currentHour = now.getHours(); 
         this.logger.verbose(`Checking schedule for hour ${currentHour}`);
         let updated = false;

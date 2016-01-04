@@ -1,0 +1,61 @@
+@import "node_modules/materialize-css/sass/components/color";
+
+$primary-color: color("light-blue","base") !default;
+$primary-color-light: false !default;
+$primary-color-dark: false !default;
+@if not $primary-color-light {
+    $primary-color-light: lighten($primary-color, 15%);
+}
+@if not $primary-color-dark {
+    $primary-color-dark: darken($primary-color, 15%);
+}
+$secondary-color: color("green","accent-3");
+$bg-color: color("grey","darken-3");
+$bg-text-color: #ffffff;
+
+$roboto-font-path: "../../node_modules/materialize-css/font/roboto/";
+$icons-font-path: "../../node_modules/materialize-css/font/material-design-icons/";
+@import "node_modules/materialize-css/sass/materialize.scss";
+
+body {
+    background-color: $bg-color;
+    color: $bg-text-color;
+}
+
+select, .collection, .modal {
+    color: $off-black;
+}
+
+nav .switch label {
+    color: #fff !important;
+}
+
+nav .switch label {
+    font-size: 1.0rem;
+    margin-right: 16px;
+}
+
+.refresh-btn {
+    color: #fff;
+}
+
+.weather-info {
+    position: absolute;
+    background-color: #fff;
+    color: $off-black;
+    margin: 8px 8px 0 8px;
+    padding: 0 8px;
+    border: 1px solid #9e9e9e;
+    text-transform: capitalize;
+}
+.weather-info img {
+    margin-right: 8px;
+}
+
+.weather-btn, .delete-btn {
+    color: #9e9e9e;
+}
+
+.weather-btn {
+    margin-top: -6px;
+}

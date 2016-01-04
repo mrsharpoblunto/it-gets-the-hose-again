@@ -9,7 +9,7 @@ export default class Loading extends React.Component {
             <div className='valign center-align' style={{width:'100%'}}>
             <h4>{this.props.text ? this.props.text : 'Loading'}</h4>
                 <div className='preloader-wrapper large active'>
-                    <div className='spinner-layer spinner-blue-only'>
+                    <div className='spinner-layer spinner-green-only'>
                         <div className='circle-clipper left'>
                             <div className='circle'></div>
                         </div>

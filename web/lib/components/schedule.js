@@ -43,7 +43,7 @@ export default class ScheduleComponent extends React.Component {
                 <h3>Schedule</h3>
                 {this.props.items.length ? (
                 <div className='col s12'>
-                    <table className='highlight bordered'>
+                    <table className='bordered'>
                         <thead>
                             <tr>
                                 <th>Water for</th>
@@ -58,23 +58,22 @@ export default class ScheduleComponent extends React.Component {
                                     <td>{i.duration} Minute{i.duration > 1 ? 's': ''}</td>
                                     <td>{i.time === 0 ? '12' : (i.time > 12 ? (i.time - 12) : i.time)}.00 {i.time === 0 ? 'midnight' : (i.time === 12 ? ' noon' : (i.time > 12 ? 'p.m.' : 'a.m.'))}</td>
                                     <td>{i.frequency} Day{i.frequency > 1 ? 's': ''}</td>
-                                    <td width='24'><button style={{padding:'0 8px'}} onClick={this.handleDelete.bind(this,i.id) } className='btn-flat'><i className='material-icons'>delete</i></button></td>
+                                    <td width='24'><button style={{padding:'0 8px'}} onClick={this.handleDelete.bind(this,i.id) } className='btn-flat delete-btn'><i className='material-icons'>delete</i></button></td>
                                 </tr>);
                             })}
                         </tbody>
                     </table>
                 </div>) :
                 (<div className='col s12 m6 offset-m3'>
-                    <div className='card-panel teal'>
+                    <div className='card-panel green accent-4'>
                         <span className='white-text'>
-                            <h5>Nothing scheduled</h5>
                             Your watering schedule is currently empty. You can configure watering to occur on an automated schedule by clicking on the Add button below and choosing the duration, time, and frequency at which the watering should occur.
                         </span>
                     </div>
                 </div>)}
 
                 <div className='fixed-action-btn' style={{'bottom': '24px', 'right': '24px'}}>
-                    <a onClick={this.handleShowAdd} className='btn-floating btn-large red waves-effect waves-light'>
+                    <a onClick={this.handleShowAdd} className='btn-floating btn-large waves-effect waves-light'>
                         <i className='large material-icons'>add</i>
                     </a>
                 </div>
@@ -142,8 +141,8 @@ export default class ScheduleComponent extends React.Component {
                         </div>
                     </div>
                     <div className='modal-footer'>
-                        <a className={'modal-action waves-effect waves-green btn-flat'+(this.props.adding?' disabled':'')} onClick={this.handleCancel}>Cancel</a>
-                        <a className={'modal-action waves-effect waves-green btn-flat'+(this.props.adding?' disabled':'')}  onClick={this.handleAdd}>{this.props.adding ? 'Adding' : 'Add'}</a>
+                        <a className={'modal-action waves-effect btn-flat'+(this.props.adding?' disabled':'')} onClick={this.handleCancel}>Cancel</a>
+                        <a className={'modal-action waves-effect btn-flat'+(this.props.adding?' disabled':'')}  onClick={this.handleAdd}>{this.props.adding ? 'Adding' : 'Add'}</a>
                     </div>
                 </div>
             </div>);
