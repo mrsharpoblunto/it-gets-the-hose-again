@@ -29,7 +29,6 @@ done
 npm install
 NODE_ENV=production ./node_modules/.bin/gulp clean
 NODE_ENV=production ./node_modules/.bin/gulp build
-npm prune --production
 
  set the app-server to auto start on boot
 cp upstart.conf /etc/init/itgetsthehose.conf
