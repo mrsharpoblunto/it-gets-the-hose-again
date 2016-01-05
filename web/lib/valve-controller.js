@@ -58,7 +58,7 @@ export default class ValveController extends EventEmitter {
         if (this.statusGpio) {
             let count = 10;
             let status = 1;
-            flash = () => {
+            const flash = () => {
                 if (count > 0 && this.statusGpio) {
                     this.statusGpio.writeSync(status);
                     --count;
