@@ -3,7 +3,6 @@ require('babel/register')({
 });
 
 var gulp = require('gulp'),
-    minifycss = require('gulp-minify-css'),
     uglify = require('gulp-uglify'),
     imagemin = require('gulp-imagemin'),
     concat = require('gulp-concat'),
@@ -42,28 +41,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 args.push('index.js');
 var node = new Restartable('node',args);
-    
-gulp.task('styles',['images'], function() {
-    if (process.env.NODE_ENV === 'production') {
-        return gulp.src('assets/css/app.css')
-            .pipe(newer('public/css/app.css'))
-            .pipe(minifycss())
-            .pipe(gulp.dest('public/css'));
-    } else {
-        return gulp.src('assets/css/*.css')
-            .pipe(gulp.dest('public/css'));
-    }
-});
-
-gulp.task('vendor-styles', function() {
-    return gulp.src([
-        'node_modules/materialize-css/dist/css/materialize.css'
-    ])
-        .pipe(newer('public/css/vendor.css'))
-        .pipe(concat('vendor.css'))
-        .pipe(minifycss())
-        .pipe(gulp.dest('public/css'));
-});
 
 gulp.task('jquery-scripts', function() {
     return gulp.src([
@@ -123,12 +100,6 @@ gulp.task('images', function() {
         .pipe(gulp.dest('public/img'));
 });
 
-gulp.task('fonts',function() {
-    return gulp.src('node_modules/materialize-css/dist/font/**/*')
-        .pipe(newer('public/font'))
-        .pipe(gulp.dest('public/font'));
-});
-
 gulp.task('html',function() {
     return gulp.src('assets/html/**/*')
         .pipe(newer('public'))
@@ -155,7 +126,7 @@ gulp.task('clean', function(cb) {
     });
 });
 
-gulp.task('build-common',['styles','vendor-styles','jquery-scripts','images','fonts','html','lint']);
+gulp.task('build-common',['jquery-scripts','images','html','lint']);
 
 // external tasks
 gulp.task('build',['build-common','webpack']);
@@ -163,7 +134,6 @@ gulp.task('testsw',['tests'], function() {
     gulp.watch(['lib/**/*.js','test/**/*.js'],['tests']);
 });
 gulp.task('serverw', ['build-common','webpack-dev-server'],function() {
-    gulp.watch('assets/css/**/*',['styles']);
     gulp.watch('assets/img/**/*',['images']);
     gulp.watch('lib/**/*.js',['lint']);
     gulp.watch(['lib/**/*.js'],['server']);

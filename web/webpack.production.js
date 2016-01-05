@@ -28,7 +28,7 @@ module.exports = {
     },
     module: {
         loaders: [
-            { test: /\.jsx?$/, loaders: ['babel?stage=0&optional=runtime'], exclude: /node_modules/ }
+            { test: /\.jsx?$/, loaders: ['babel?stage=0&optional=runtime'], exclude: /node_modules/ },
             {test: /\.scss$/, loader: ExtractTextPlugin.extract('css?autoprefixer&minimize!resolve-url!sass-loader?outputStyle=compressed')},
             {test: /\.(ttf|eot|svg|woff(2)?)/, loader: 'file?name=css/fonts/[name].[ext]?v=[hash]'},
             {test: /\.(png|gif|jpg)/, loader: 'file?name=/css/images/[name].[ext]?v=[hash]'}

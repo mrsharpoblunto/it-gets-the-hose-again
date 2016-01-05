@@ -120,12 +120,15 @@ function startServer(app) {
     }).on('error',err=> {
       if (started) {
         app.logger.error(err.stack);
+        process.exit(1);
       }
       else if (err.code === 'EACCES') {
         app.logger.error(`Unable to listen on port ${config.APP_SERVER_PORT}. This is usually due to the process not having permissions to bind to this port. Did you mean to run the server in dev mode with a non-priviledged port instead?`);
+        process.exit(1);
       }
       else if (err.code === 'EADDRINUSE') {
         app.logger.error(`Unable to listen on port ${config.APP_SERVER_PORT} because another process is already listening on this port. Do you have another instance of the server already running?`);
+        process.exit(1);
       }
     });
 }
