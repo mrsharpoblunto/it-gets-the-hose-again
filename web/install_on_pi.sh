@@ -1,3 +1,4 @@
+#!/bin/bash
 # generate a self signed ssl cert
 ifconfig | grep 'inet ' | awk '{print $2}' | while read -r line
 do

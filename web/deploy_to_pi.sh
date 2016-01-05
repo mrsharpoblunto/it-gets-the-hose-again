@@ -1,3 +1,4 @@
+#!/bin/bash
 NODE_ENV=production ./node_modules/.bin/gulp clean
 NODE_ENV=production ./node_modules/.bin/gulp build
 

@@ -6,11 +6,25 @@ function unauthorized(res) {
     res.sendStatus(401);
 }
 
+const cache = {};
+
 export default function(app) {
     return (req,res,next)=> {
         const user = basicAuth(req);
         if (!user || !user.name || !user.pass) {
             return unauthorized(res);
+        }
+
+        // check the cache first as this is faster
+        // than spawning pwauth for every request
+        const cached = cache[user.name];
+        if (cached) {
+            if (user.pass === cached.pass) {
+                next();
+            } else {
+                unauthorized(res);
+            }
+            return;
         }
 
         //spawn pwauth and check the users credentials
@@ -20,6 +34,7 @@ export default function(app) {
                 app.logger.warning(`User ${user.name} failed authorization`);
                 unauthorized(res);
             } else {
+                cache[user.name] = { pass: user.pass };
                 next();
             }
         });

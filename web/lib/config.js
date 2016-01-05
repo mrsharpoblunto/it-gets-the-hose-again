@@ -1,7 +1,6 @@
-export const OPEN_WEATHER_API_KEY = 'e8ec11f15c10f4d172cdaa13f469e45f';
 export const VALVE_GPIO = process.env.NODE_ENV === 'production' ? 22 : null;
 export const STATUS_GPIO = process.env.NODE_ENV === 'production' ? 27 : null;
-export const LOG_LEVEL = process.env.NODE_ENV === 'production' ? 'error' : 'info';
+export const LOG_LEVEL = process.env.NODE_ENV === 'production' ? 'info' : 'verbose';
 export const APP_HTTPS = process.env.NODE_ENV === 'production';
 export const APP_SERVER_PORT = process.env.NODE_ENV === 'production' ? (APP_HTTPS ? 443 : 80) : 3000;
 export const MAX_AGE = '31536000';

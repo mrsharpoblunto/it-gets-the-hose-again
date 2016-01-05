@@ -43,7 +43,7 @@ app.use(morgan('combined',{ stream: {
 
 app.use(bodyParser.json());
 if (process.env.NODE_ENV === 'production') {
-    app.use(pwauth);
+    app.use(pwauth(app));
 } else {
     app.use(errorHandler({ dumpExceptions: true, showStack: true }));
 }

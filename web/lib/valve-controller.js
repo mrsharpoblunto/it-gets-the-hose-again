@@ -20,17 +20,18 @@ export default class ValveController extends EventEmitter {
         this.open = false;
         this.logger = logger;
         this.history = history;
-        this.valveGpio = config.VALVE_GPIO && onoff ? new onoff.Gpio(config.VALVE_GPIO,'out') : null;
-        this.statusGpio = config.STATUS_GPIO && onoff ? new onoff.Gpio(config.STATUS_GPIO,'out') : null;
+        this.valveGpio = (config.VALVE_GPIO && onoff) ? new onoff.Gpio(config.VALVE_GPIO,'out') : null;
+        this.statusGpio = (config.STATUS_GPIO && onoff) ? new onoff.Gpio(config.STATUS_GPIO,'out') : null;
 
         // make sure the valve gets shut off if the program exits
         process.on('exit',this.cleanup.bind(this,false));
         process.on('SIGINT',this.cleanup.bind(this,true));
+        process.on('SIGTERM',this.cleanup.bind(this,true));
         process.on('uncaughtException',this.cleanup.bind(this,true));
 
         if (this.statusGpio) {
             this.logger.verbose('Set status Gpio signal');
-            this.statusGpio.write(true);
+            this.statusGpio.writeSync(1);
         }
         this.logger.info('Valve Controller initialized');
     }
@@ -54,13 +55,26 @@ export default class ValveController extends EventEmitter {
     }
     identify() {
         this.logger.info('Identify called');
+        if (this.statusGpio) {
+            let count = 10;
+            let status = 1;
+            flash = () => {
+                if (count > 0 && this.statusGpio) {
+                    this.statusGpio.writeSync(status);
+                    --count;
+                    status = status ? 0 : 1;
+                    setTimeout(flash,100);
+                }
+            }
+            flash();
+        }
     }
     _setOpen(open,source,cb) {
         if (open === this.open) {
             return cb(null,{open,source});
         }
 
-        this.logger.info(`Valve set by ${source} to ${open?'open':'closed'}`);
+        this.logger.verbose(`Valve set by ${source} to ${open?'open':'closed'}`);
         this.history.write(source,open? 'Watering started' : 'Watering stopped',err => {
             if (err) {
                 this.logger.error('Unable to write history item');

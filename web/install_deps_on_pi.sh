@@ -16,6 +16,8 @@ if !(command -v node >/dev/null 2>&1) then
 fi
 
 # set the app-server to auto start on boot
-cp upstart.conf /etc/init/itgetsthehose.conf
+cp systemd.conf /etc/systemd/system/itgetsthehose.service
 cwd=$(pwd)
-sed -i.bak 's|CWD|'"$cwd"'|g' /etc/init/itgetsthehose.conf
+sed -i.bak 's|CWD|'"$cwd"'|g' /etc/systemd/system/itgetsthehose.service
+rm /etc/systemd/system/itgetsthehose.service.bak
+systemctl enable itgetsthehose
