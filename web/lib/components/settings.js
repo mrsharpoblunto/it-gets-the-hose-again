@@ -25,6 +25,7 @@ export default class SettingsComponent extends React.Component {
         }
     }
     componentDidUpdate() {
+        /* eslint no-undef:0 */
         Materialize.updateTextFields();
     }
     componentWillReceiveProps(nextProps) {
