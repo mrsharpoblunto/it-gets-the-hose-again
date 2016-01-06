@@ -5,6 +5,7 @@ import superagent from '../superagent-promise';
 import * as keys from '../../keys';
 import { getSettings, updateSettings } from '../actions/settings';
 import Loading from './loading';
+import * as clientConfig from '../client-config';
 
 @connect(state => state.settings)
 export default class SettingsComponent extends React.Component {
@@ -22,6 +23,9 @@ export default class SettingsComponent extends React.Component {
         } else {
             this.setStateFromProps(this.props);
         }
+    }
+    componentDidUpdate() {
+        Materialize.updateTextFields();
     }
     componentWillReceiveProps(nextProps) {
         if (nextProps.initialized && !nextProps.updating) {
@@ -66,6 +70,17 @@ export default class SettingsComponent extends React.Component {
         return !this.props.initialized ? <Loading /> : (<div className='row'>
             <h3>Settings</h3>
             <form className='col s12'>
+                <div className='row'>
+                    <div className='col s12'>
+                        <p>The 8 digit Pin code required to register this device with Apple HomeKit.</p>
+                    </div>
+                </div>
+                <div className='row'>
+                    <div className='input-field col s12'>
+                        <label htmlFor="homekit-pin">HomeKit Pin</label>
+                        <input value={clientConfig.HOMEKIT_PINCODE} readOnly={true} id="homekit-pin" type="text" />
+                    </div>
+                </div>
                 <div className='row'>
                     <div className='col s12'>
                         <p>Automatically switch off the valve after a set duration of time. This setting does not affect scheduled waterings.</p>

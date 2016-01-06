@@ -135,6 +135,7 @@ gulp.task('testsw',['tests'], function() {
 });
 gulp.task('serverw', ['build-common','webpack-dev-server'],function() {
     gulp.watch('assets/img/**/*',['images']);
+    gulp.watch('assets/html/**/*',['html']);
     gulp.watch('lib/**/*.js',['lint']);
     gulp.watch(['lib/**/*.js'],['server']);
 });

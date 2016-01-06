@@ -21,6 +21,7 @@ coverage
 node_modules
 
 *.swp
+.DS_Store
 
 web/keys.js
 web/public
