@@ -10,6 +10,10 @@ const cache = {};
 
 export default function(app) {
     return (req,res,next)=> {
+        if (req.path.indexOf("/img/") === 0 || req.path.indexOf("/css/") === 0) {
+            return next();
+        }
+
         const user = basicAuth(req);
         if (!user || !user.name || !user.pass) {
             return unauthorized(res);
