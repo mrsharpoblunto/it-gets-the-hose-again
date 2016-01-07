@@ -1,5 +1,5 @@
 # it-gets-the-hose-again
-It-Gets-The-Hose-Again is a Raspberry Pi (compatible with A,B,A+,B+ & Zero) controlled Garden sprinkler system that can be controlled via web UI or by HomeKit compatible Apps. This repo includes the source & installation instructions for controller software as well as schematics for the hardware components that need to be added to your Pi in order for the software to control sprinkler hardware.
+It-Gets-The-Hose-Again is a Raspberry Pi (compatible with A,B,A+,B+,2, and Zero) controlled Garden sprinkler system that can be controlled via web UI or by HomeKit compatible Apps. This repo includes the source & installation instructions for controller software as well as schematics for the hardware components that need to be added to your Pi in order for the software to control sprinkler hardware.
 
 [Software](web/README.md)
 -------------------------

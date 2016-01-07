@@ -279,7 +279,7 @@ export default function(app) {
             .end()
             .then(apiRes => {
                 const weather = apiRes.body.weather[0];
-                weather.icon = `http://openweathermap.org/img/w/${weather.icon}.png`;
+                weather.icon = `https://openweathermap.org/img/w/${weather.icon}.png`;
                 res.json({
                     success: true,
                     weather

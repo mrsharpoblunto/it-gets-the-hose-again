@@ -27,7 +27,7 @@ While it is possible to build the application on the Pi itself, it is *much* fas
 * run ```deploy_to_pi.sh user@raspberry-pi-ip:/path/to/web/app/folder/you/were/in/on/the/previous/step```. This will rsync the built application to the pi (it will also ask you for the pi users password a couple of times if you have not set up passwordless SSH).
 
 ##### Then on the Pi
-* Run ```sudo systemctl start itgetsthehoseagain``` (Note install_deps_on_pi will have set this service to auto start on boot)
+* Run ```sudo systemctl start itgetsthehose``` (Note install_deps_on_pi will have set this service to auto start on boot)
 
 ##### Finally, On any device
 * You should now be able to browse to https://&lt;my-raspberry-pi-ip&gt;/ and enter a valid Linux username/password for your Pi (by default pi/raspberry) and see the webUI
