@@ -1,6 +1,5 @@
-'use strict'
 import { combineReducers } from 'redux';
-import { routeReducer }  from 'redux-simple-router';
+import { routeReducer } from 'redux-simple-router';
 import authReducer from './auth-reducer';
 import valveReducer from './valve-reducer'
 import scheduleReducer from './schedule-reducer';

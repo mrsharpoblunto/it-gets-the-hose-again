@@ -3,7 +3,7 @@ import superagent from '../superagent-promise';
 import actions from './action-types';
 import { pollValve } from './valve';
 
-export function login(name,password) {
+export function login(name, password) {
     return dispatch => {
         dispatch({
             type: actions.LOGIN_START
@@ -32,4 +32,3 @@ export function login(name,password) {
             });
     };
 }
-

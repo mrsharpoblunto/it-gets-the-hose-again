@@ -31,7 +31,7 @@ export function removeFromSchedule(id) {
             id
         });
         superagent
-            .del('/api/1/schedule/'+id)
+            .del('/api/1/schedule/' + id)
             .end()
             .then(res => {
                 res.body.type = actions.REMOVE_FROM_SCHEDULE_FINISH;
@@ -49,7 +49,7 @@ export function removeFromSchedule(id) {
     };
 }
 
-export function addToSchedule(duration,time,frequency) {
+export function addToSchedule(duration, time, frequency) {
     return dispatch => {
         dispatch({
             type: actions.ADD_TO_SCHEDULE_START

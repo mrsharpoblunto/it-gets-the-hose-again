@@ -13,10 +13,10 @@ export function getSettings() {
             .accept('json')
             .end()
             .then(res => {
-               res.body.type = actions.GET_SETTINGS_FINISH;
-               dispatch(res.body);
+                res.body.type = actions.GET_SETTINGS_FINISH;
+                dispatch(res.body);
             })
-            .catch(err=> {
+            .catch(err => {
                 dispatch({
                     type: actions.GET_SETTINGS_FINISH,
                     success: false
@@ -38,10 +38,10 @@ export function updateSettings(settings) {
             .send(settings)
             .end()
             .then(res => {
-               res.body.type = actions.UPDATE_SETTINGS_FINISH;
-               dispatch(res.body);
+                res.body.type = actions.UPDATE_SETTINGS_FINISH;
+                dispatch(res.body);
             })
-            .catch(err=> {
+            .catch(err => {
                 dispatch({
                     type: actions.UPDATE_SETTINGS_FINISH,
                     success: false

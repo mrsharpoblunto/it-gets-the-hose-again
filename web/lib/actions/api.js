@@ -1,4 +1,3 @@
-'use strict'
 import { pushPath } from 'redux-simple-router';
 
 export function apiError(err) {

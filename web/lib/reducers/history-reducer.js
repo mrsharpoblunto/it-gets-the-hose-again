@@ -9,10 +9,10 @@ function getInitialState() {
     };
 }
 
-export default function reducer(state = getInitialState(),action) {
+export default function reducer(state = getInitialState(), action) {
     switch (action.type) {
         case actions.GET_HISTORY_START:
-            return Object.assign({},state,{
+            return Object.assign({}, state, {
                 loading: true
             });
         case actions.GET_HISTORY_FINISH:
@@ -20,14 +20,14 @@ export default function reducer(state = getInitialState(),action) {
                 const items = action.items
                     .filter(i => i.id > state.latest)
                     .concat(state.items.slice(0));
-                return Object.assign({},state,{
+                return Object.assign({}, state, {
                     loading: false,
                     initialized: true,
                     items: items,
                     latest: action.latest
                 });
             }
-            return Object.assign({},state,{
+            return Object.assign({}, state, {
                 loading: false
             });
         default:

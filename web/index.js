@@ -4,7 +4,7 @@ require('babel/register')({
 });
 
 // tidy up babels default stacktrace rendering
-process.on("uncaughtException",function(err) {
+process.on("uncaughtException", function(err) {
     if (err._babel && err instanceof SyntaxError) {
         console.error(err.message + "\n" + err.codeFrame);
     } else {

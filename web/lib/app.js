@@ -1,4 +1,3 @@
-'use strict'
 import path from 'path';
 import http from 'http';
 import https from 'https';
@@ -27,27 +26,32 @@ import * as config from './config';
 // configure express and its middleware
 const app = express();
 app.enable('trust proxy');
-app.set('port',config.APP_SERVER_PORT);
+app.set('port', config.APP_SERVER_PORT);
 app.use(compression());
 
 // configure logging
-app.logger = new (winston.Logger)({
-  transports: [
-    new winston.transports.Console({
-      level: config.LOG_LEVEL,
-      colorize: true,
-      timestamp: true
-    })
-  ]
+app.logger = new(winston.Logger)({
+    transports: [
+        new winston.transports.Console({
+            level: config.LOG_LEVEL,
+            colorize: true,
+            timestamp: true
+        })
+    ]
 });
-app.use(morgan('combined',{ stream: {
-  write: message => app.logger.verbose(message)
-}}));
+app.use(morgan('combined', {
+    stream: {
+        write: message => app.logger.verbose(message)
+    }
+}));
 
 app.use(cookieParser(uuid.v4()));
 app.use(bodyParser.json());
 if (process.env.NODE_ENV !== 'production') {
-    app.use(errorHandler({ dumpExceptions: true, showStack: true }));
+    app.use(errorHandler({
+        dumpExceptions: true,
+        showStack: true
+    }));
 }
 
 // setup storage engine
@@ -79,20 +83,20 @@ startHomekitServer(app);
 startServer(app);
 
 function configureRoutes(app) {
-  app.use(express.static(path.join(__dirname,'..','public'),config.PUBLIC_STATIC_CACHING));
+    app.use(express.static(path.join(__dirname, '..', 'public'), config.PUBLIC_STATIC_CACHING));
 
-  /**
-   * when running in dev mode without using the webpack-dev-server, we don't want
-   * the app to try and handle requests coming from the client that are intended
-   * for the webpack-dev-server
-   */
-  app.get('/socket.io*',(req,res)=> {
-      const message = 'You are not running this application via webpack-dev-server. Browse to this application using the webpack-dev-server port to enable webpack support';
-      app.logger.warn(message);
-      res.status(502).send(message);
-  });
+    /**
+     * when running in dev mode without using the webpack-dev-server, we don't want
+     * the app to try and handle requests coming from the client that are intended
+     * for the webpack-dev-server
+     */
+    app.get('/socket.io*', (req, res) => {
+        const message = 'You are not running this application via webpack-dev-server. Browse to this application using the webpack-dev-server port to enable webpack support';
+        app.logger.warn(message);
+        res.status(502).send(message);
+    });
 
-  app.post('/login',(req,res) => {
+    app.post('/login', (req, res) => {
         if (!req.body || !req.body.name || !req.body.password) {
             return res.json({
                 success: false,
@@ -100,7 +104,7 @@ function configureRoutes(app) {
             });
         }
 
-        pwauth(req.body.name,req.body.password,(err,success) => {
+        pwauth(req.body.name, req.body.password, (err, success) => {
             if (err) {
                 app.logger.error(`Unable to authenticate via pwauth - ${err.stack}`);
                 res.sendStatus(500);
@@ -117,67 +121,63 @@ function configureRoutes(app) {
                 });
             }
         });
-   }); 
+    });
 
-   app.get('/logout', (req,res) => {
+    app.get('/logout', (req, res) => {
         destroySession(res);
         res.redirect('/');
-   });
+    });
 
-  /**
-   * handle rendering of the UI
-   */
-  app.get('/*',(req,res) => {
-    res.sendFile(path.join(__dirname,'..','public','index.html'));
-  });
+    /**
+     * handle rendering of the UI
+     */
+    app.get('/*', (req, res) => {
+        res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+    });
 }
 
 function startHomekitServer(app) {
-   hap.init();
-   const accessory = require('./valve-accessory')(app.valveController);
-   accessory.publish({
+    hap.init();
+    const accessory = require('./valve-accessory')(app.valveController);
+    accessory.publish({
         port: config.HOMEKIT_PORT,
         username: config.HOMEKIT_USERNAME,
         pincode: config.HOMEKIT_PINCODE
-   });
-   app.logger.info('Published HomeKit Accessory Info');  
+    });
+    app.logger.info('Published HomeKit Accessory Info');
 }
 
 function startServer(app) {
-    const server = config.APP_HTTPS ? https.createServer(sslConfig(),app) : http.createServer(app)
+    const server = config.APP_HTTPS ? https.createServer(sslConfig(), app) : http.createServer(app)
     let started = false;
     server.listen(config.APP_SERVER_PORT, () => {
         app.logger.info('Express server awaiting connections');
         started = true;
-    }).on('error',err=> {
-      if (started) {
-        app.logger.error(err.stack);
-        process.exit(1);
-      }
-      else if (err.code === 'EACCES') {
-        app.logger.error(`Unable to listen on port ${config.APP_SERVER_PORT}. This is usually due to the process not having permissions to bind to this port. Did you mean to run the server in dev mode with a non-priviledged port instead?`);
-        process.exit(1);
-      }
-      else if (err.code === 'EADDRINUSE') {
-        app.logger.error(`Unable to listen on port ${config.APP_SERVER_PORT} because another process is already listening on this port. Do you have another instance of the server already running?`);
-        process.exit(1);
-      }
+    }).on('error', err => {
+        if (started) {
+            app.logger.error(err.stack);
+            process.exit(1);
+        } else if (err.code === 'EACCES') {
+            app.logger.error(`Unable to listen on port ${config.APP_SERVER_PORT}. This is usually due to the process not having permissions to bind to this port. Did you mean to run the server in dev mode with a non-priviledged port instead?`);
+            process.exit(1);
+        } else if (err.code === 'EADDRINUSE') {
+            app.logger.error(`Unable to listen on port ${config.APP_SERVER_PORT} because another process is already listening on this port. Do you have another instance of the server already running?`);
+            process.exit(1);
+        }
     });
 }
 
 function sslConfig() {
     return {
-        cert: tryReadFileSync(path.join(__dirname,'..','ssl','server.crt')),
-        key: tryReadFileSync(path.join(__dirname,'..','ssl','server.key'))
+        cert: tryReadFileSync(path.join(__dirname, '..', 'ssl', 'server.crt')),
+        key: tryReadFileSync(path.join(__dirname, '..', 'ssl', 'server.key'))
     };
 }
 
 function tryReadFileSync(path) {
-  try
-  {
-    return fs.readFileSync(path,'utf8');
-  }
-  catch (err) {
-    return null; 
-  }
+    try {
+        return fs.readFileSync(path, 'utf8');
+    } catch (err) {
+        return null;
+    }
 }

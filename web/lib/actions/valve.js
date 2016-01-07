@@ -6,33 +6,33 @@ import { apiError } from './api';
 import * as clientConfig from '../client-config';
 
 export function toggleValve() {
-   return dispatch => {
-      dispatch({
-        type: actions.TOGGLE_VALVE_START
-      })
-      return superagent
-        .post('/api/1/toggle-valve')
-        .type('json')
-        .accept('json')
-        .end()
-        .then(res => {
-            res.body.type = actions.TOGGLE_VALVE_FINISH;
-            dispatch(res.body);
+    return dispatch => {
+        dispatch({
+            type: actions.TOGGLE_VALVE_START
         })
-        .catch(err => {
-            dispatch({
-                type: actions.TOGGLE_VALVE_FINISH,
-                success: false
+        return superagent
+            .post('/api/1/toggle-valve')
+            .type('json')
+            .accept('json')
+            .end()
+            .then(res => {
+                res.body.type = actions.TOGGLE_VALVE_FINISH;
+                dispatch(res.body);
+            })
+            .catch(err => {
+                dispatch({
+                    type: actions.TOGGLE_VALVE_FINISH,
+                    success: false
+                });
+                dispatch(apiError(err));
             });
-            dispatch(apiError(err));
-        });
-   };
+    };
 }
 
 let polling = false;
 
 export function pollValve(internal) {
-    return (dispatch,getState) => {
+    return (dispatch, getState) => {
         if (!internal && polling) return;
         polling = true;
         const startTime = new Date();
@@ -49,7 +49,7 @@ export function pollValve(internal) {
                     });
                     dispatch(updateHistory());
                 }
-                setTimeout(()=>dispatch(pollValve(true)),(new Date()).getTime() - startTime < 1000 ? 1000 : 0);
+                setTimeout(() => dispatch(pollValve(true)), (new Date()).getTime() - startTime < 1000 ? 1000 : 0);
             })
             .catch(err => {
                 polling = false;

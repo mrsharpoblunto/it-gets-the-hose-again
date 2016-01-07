@@ -9,15 +9,15 @@ function getInitialState() {
     };
 }
 
-export default function reducer(state = getInitialState(),action) {
+export default function reducer(state = getInitialState(), action) {
     switch (action.type) {
         case actions.GET_SETTINGS_START:
-            return Object.assign({},state,{
+            return Object.assign({}, state, {
                 loading: true
             });
         case actions.GET_SETTINGS_FINISH:
             if (action.success) {
-                return Object.assign({},state,{
+                return Object.assign({}, state, {
                     loading: false,
                     initialized: true,
                     settings: action.settings
@@ -25,17 +25,17 @@ export default function reducer(state = getInitialState(),action) {
             }
             return state;
         case actions.UPDATE_SETTINGS_START:
-            return Object.assign({},state,{
+            return Object.assign({}, state, {
                 updating: true
             });
         case actions.UPDATE_SETTINGS_FINISH:
             if (action.success) {
-                return Object.assign({},state,{
-                   updating: false,
-                   settings: action.settings
+                return Object.assign({}, state, {
+                    updating: false,
+                    settings: action.settings
                 });
             }
-            return Object.assign({},state,{
+            return Object.assign({}, state, {
                 updating: false
             });
         default:

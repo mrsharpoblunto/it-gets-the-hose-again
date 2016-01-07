@@ -1,4 +1,3 @@
-'use strict'
 import { Router,Route, IndexRoute } from 'react-router';
 import React from 'react';
 import Main from './components/main';
@@ -8,13 +7,12 @@ import History from './components/history';
 import Login from './components/login';
 import NotFound from './components/not-found';
 
-export default (
-  <Router>
+export default (<Router>
     <Route path='/login' component={Login} />
     <Route path='/' component={Main}>
-      <IndexRoute component={Schedule} />
-      <Route path='/settings' component={Settings} />
-      <Route path='/history' component={History} />
-      <Route path='*' component={NotFound} />
+        <IndexRoute component={Schedule} />
+        <Route path='/settings' component={Settings} />
+        <Route path='/history' component={History} />
+        <Route path='*' component={NotFound} />
     </Route>
-  </Router>);
+</Router>);

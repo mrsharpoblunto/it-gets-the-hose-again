@@ -11,7 +11,7 @@ function systemTimer() {
 }
 
 export default class Scheduler {
-    constructor(storage,history,logger,valveController,timer=systemTimer()) {
+    constructor(storage, history, logger, valveController, timer = systemTimer()) {
         this.storage = storage;
         this.history = history;
         this.logger = logger;
@@ -25,7 +25,9 @@ export default class Scheduler {
     start() {
         this.logger.info('Scheduler starting...');
         this._load(() => {
-            this.valveController.on('setOpen',({open,source}) => {
+            this.valveController.on('setOpen', ({
+                open, source
+            }) => {
                 if (source !== config.SCHEDULER) {
                     if (open && this.settings.shutoffDuration) {
                         // ensure that if we manually opened the valve
@@ -40,7 +42,7 @@ export default class Scheduler {
                 }
             });
             this._check();
-            this.checkHandle = setInterval(this._check,config.SCHEDULE_CHECK_INTERVAL);
+            this.checkHandle = setInterval(this._check, config.SCHEDULE_CHECK_INTERVAL);
             this.logger.info('Scheduler running');
         });
     }
@@ -56,36 +58,35 @@ export default class Scheduler {
     }
 
     _load(cb) {
-        this.storage.getItem(config.SETTINGS_KEY,(err,settings) => {
+        this.storage.getItem(config.SETTINGS_KEY, (err, settings) => {
             if (err) {
                 this.logger.error(`Unable to load settings ${err.stack}`);
             }
             this.settings = settings || {};
 
-            this.storage.getItem(config.SCHEDULE_KEY,(err,schedule) => {
-               if (err) {
+            this.storage.getItem(config.SCHEDULE_KEY, (err, schedule) => {
+                if (err) {
                     this.logger.error(`Unable to load schedule ${err.stack}`);
-               }
-               this.schedule = schedule ? schedule.items : [];
-               if (cb) {
+                }
+                this.schedule = schedule ? schedule.items : [];
+                if (cb) {
                     cb();
-               }
+                }
             });
         });
     }
 
     _check = () => {
         const now = this.timer.now();
-        const currentHour = now.getHours(); 
+        const currentHour = now.getHours();
         this.logger.verbose(`Checking schedule for hour ${currentHour}`);
         let updated = false;
         this.schedule.map(item => {
             this.logger.debug(JSON.stringify(item));
-            if (item.time === currentHour 
-            && (!item.nextRun || now.getTime() >= item.nextRun)
-            // don't start new tasks if we're more than 5 minutes
-            // past the hour
-            && now.getMinutes() < 5) {
+            if (item.time === currentHour && (!item.nextRun || now.getTime() >= item.nextRun)
+                // don't start new tasks if we're more than 5 minutes
+                // past the hour
+                && now.getMinutes() < 5) {
                 item.nextRun = this._startOfDay(now) + ((86400 * item.frequency) + (3600 * item.time)) * 1000;
                 this.logger.verbose(`Schedule item will run - next run ${item.nextRun}`);
                 const nextWater = now.getTime() + (item.duration * 60 * 1000);
@@ -98,16 +99,16 @@ export default class Scheduler {
         });
 
         if (updated) {
-            this.storage.setItem(config.SCHEDULE_KEY,{ 
-                items: this.schedule 
-            },err => {
+            this.storage.setItem(config.SCHEDULE_KEY, {
+                items: this.schedule
+            }, err => {
                 if (err) {
                     return this.logger.error(`Unable to update schedule ${err.stack}`);
                 }
                 if (this.settings.location) {
-                    this._checkWeather(this.settings.location,(shouldWater,weatherDesc) => {
+                    this._checkWeather(this.settings.location, (shouldWater, weatherDesc) => {
                         if (!shouldWater) {
-                            this.history.write(config.SCHEDULER,`Watering cancelled due to weather conditions - ${weatherDesc}`,() => {
+                            this.history.write(config.SCHEDULER, `Watering cancelled due to weather conditions - ${weatherDesc}`, () => {
                                 this._setValve(false);
                                 this.waterUntil = 0;
                             });
@@ -125,18 +126,18 @@ export default class Scheduler {
     }
 
     _setValve(open) {
-        this.valveController.setOpen(open,config.SCHEDULER,err => {
-           if (err) {
+        this.valveController.setOpen(open, config.SCHEDULER, err => {
+            if (err) {
                 this.logger.error(`Unable to set valve status ${err.stack}`);
             }
         });
     }
 
     _startOfDay(now) {
-        return (new Date(now.getFullYear(),now.getMonth(),now.getDate())).getTime();
+        return (new Date(now.getFullYear(), now.getMonth(), now.getDate())).getTime();
     }
 
-    _checkWeather(location,cb) {
+    _checkWeather(location, cb) {
         superagent
             .get(`http://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=${keys.OPEN_WEATHER_API_KEY}`)
             .accept('json')
@@ -146,16 +147,16 @@ export default class Scheduler {
                 // from http://openweathermap.org/weather-conditions
                 const code = res.body.weather[0].id;
                 if ((code >= 200 && code <= 202) ||
-                    (code >= 300 && code <= 321) || 
+                    (code >= 300 && code <= 321) ||
                     (code >= 500 && code <= 531)) {
-                    cb(false,res.body.weather[0].description);
+                    cb(false, res.body.weather[0].description);
                 } else {
-                    cb(true,null);
+                    cb(true, null);
                 }
             })
             .catch(err => {
                 this.logger.error(`Unable to check weather status for current location - ${err.stack}`);
-                cb(true,null);
+                cb(true, null);
             });
     }
 }

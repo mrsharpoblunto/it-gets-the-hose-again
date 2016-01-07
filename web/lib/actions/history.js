@@ -3,7 +3,7 @@ import { apiError } from './api';
 import superagent from '../superagent-promise';
 
 export function updateHistory() {
-    return (dispatch,getState) => {
+    return (dispatch, getState) => {
         dispatch({
             type: actions.GET_HISTORY_START
         });
@@ -14,11 +14,11 @@ export function updateHistory() {
             .accept('json')
             .end()
             .then(res => {
-               res.body.type = actions.GET_HISTORY_FINISH;
-               dispatch(res.body);
+                res.body.type = actions.GET_HISTORY_FINISH;
+                dispatch(res.body);
             })
             .catch(err => {
-               dispatch(apiError(err)); 
+                dispatch(apiError(err));
             });
     };
 }

@@ -6,15 +6,15 @@ export const APP_SERVER_PORT = process.env.NODE_ENV === 'production' ? (APP_HTTP
 export const MAX_AGE = '31536000';
 export const MAX_HISTORY_ITEMS = 100;
 export const LONGPOLL_TIMEOUT = 30000;
-export const PUBLIC_STATIC_CACHING = process.env.NODE_ENV === 'development' ? {} : { 
-  maxAge: MAX_AGE,
-  setHeaders: (res,path) => {
-    if (path === '/' || path.indexOf('.html') > 0) {
-        res.setHeader('Cache-Control','no-cache');
-    } else {
-        res.setHeader('Cache-Control',`public, max-age=${MAX_AGE}`);
+export const PUBLIC_STATIC_CACHING = process.env.NODE_ENV === 'development' ? {} : {
+    maxAge: MAX_AGE,
+    setHeaders: (res, path) => {
+        if (path === '/' || path.indexOf('.html') > 0) {
+            res.setHeader('Cache-Control', 'no-cache');
+        } else {
+            res.setHeader('Cache-Control', `public, max-age=${MAX_AGE}`);
+        }
     }
-  }
 };
 export const HOMEKIT_PORT = 51826;
 export const HOMEKIT_USERNAME = '1A:2B:3C:4D:5E:FF';
