@@ -1,5 +1,5 @@
 import actions from './action-types';
-
+import { apiError } from './api';
 import superagent from '../superagent-promise';
 
 export function getSettings() {
@@ -16,11 +16,12 @@ export function getSettings() {
                res.body.type = actions.GET_SETTINGS_FINISH;
                dispatch(res.body);
             })
-            .catch(()=> {
+            .catch(err=> {
                 dispatch({
                     type: actions.GET_SETTINGS_FINISH,
                     success: false
                 });
+                dispatch(apiError(err));
             });
     };
 }
@@ -40,11 +41,12 @@ export function updateSettings(settings) {
                res.body.type = actions.UPDATE_SETTINGS_FINISH;
                dispatch(res.body);
             })
-            .catch(()=> {
+            .catch(err=> {
                 dispatch({
                     type: actions.UPDATE_SETTINGS_FINISH,
                     success: false
                 });
+                dispatch(apiError(err));
             });
     };
 }

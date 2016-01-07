@@ -5,10 +5,12 @@ import Main from './components/main';
 import Schedule from './components/schedule';
 import Settings from './components/settings';
 import History from './components/history';
+import Login from './components/login';
 import NotFound from './components/not-found';
 
 export default (
   <Router>
+    <Route path='/login' component={Login} />
     <Route path='/' component={Main}>
       <IndexRoute component={Schedule} />
       <Route path='/settings' component={Settings} />

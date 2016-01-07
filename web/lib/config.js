@@ -8,8 +8,12 @@ export const MAX_HISTORY_ITEMS = 100;
 export const LONGPOLL_TIMEOUT = 30000;
 export const PUBLIC_STATIC_CACHING = process.env.NODE_ENV === 'development' ? {} : { 
   maxAge: MAX_AGE,
-  setHeaders: (res) => {
-    res.setHeader('Cache-Control',`public, max-age=${MAX_AGE}`);
+  setHeaders: (res,path) => {
+    if (path === '/' || path.indexOf('.html') > 0) {
+        res.setHeader('Cache-Control','no-cache');
+    } else {
+        res.setHeader('Cache-Control',`public, max-age=${MAX_AGE}`);
+    }
   }
 };
 export const HOMEKIT_PORT = 51826;
@@ -24,3 +28,5 @@ export const WEB_USER = 'web user';
 export const SCHEDULER = 'scheduler';
 export const HOMEKIT_USER = 'HomeKit user';
 export const SCHEDULE_CHECK_INTERVAL = 30000;
+export const SESSION_EXPIRY = 2592000000;
+export const SESSION_COOKIE = 'it-gets-the-hose-auth';

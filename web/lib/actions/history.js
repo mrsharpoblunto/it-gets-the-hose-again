@@ -1,4 +1,5 @@
 import actions from './action-types';
+import { apiError } from './api';
 import superagent from '../superagent-promise';
 
 export function updateHistory() {
@@ -16,7 +17,8 @@ export function updateHistory() {
                res.body.type = actions.GET_HISTORY_FINISH;
                dispatch(res.body);
             })
-            .catch(() => {
+            .catch(err => {
+               dispatch(apiError(err)); 
             });
     };
 }

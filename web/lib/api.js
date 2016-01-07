@@ -3,8 +3,12 @@ import superagent from './superagent-promise';
 import * as keys from '../keys';
 import * as config from './config';
 import * as clientConfig from './client-config';
+import { middleware } from './session';
 
 export default function(app) {
+    if (process.env.NODE_ENV === 'production') {
+        app.use('/api/*',middleware);
+    }
 
     function waitForValveEvent(timeout,callback) {
         let listener = null;

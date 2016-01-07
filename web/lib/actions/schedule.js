@@ -1,4 +1,5 @@
 import actions from './action-types';
+import { apiError } from './api';
 import superagent from '../superagent-promise';
 
 export function getSchedule() {
@@ -13,11 +14,12 @@ export function getSchedule() {
                 res.body.type = actions.GET_SCHEDULE_FINISH;
                 dispatch(res.body);
             })
-            .catch(() => {
+            .catch(err => {
                 dispatch({
                     type: actions.GET_SCHEDULE_FINISH,
                     success: false
                 });
+                dispatch(apiError(err));
             });
     };
 }
@@ -36,12 +38,13 @@ export function removeFromSchedule(id) {
                 res.body.id = id;
                 dispatch(res.body);
             })
-            .catch(() => {
+            .catch(err => {
                 dispatch({
                     type: actions.REMOVE_FROM_SCHEDULE_FINISH,
                     id,
                     success: false
                 });
+                dispatch(apiError(err));
             });
     };
 }
@@ -64,11 +67,12 @@ export function addToSchedule(duration,time,frequency) {
                 res.body.type = actions.ADD_TO_SCHEDULE_FINISH;
                 dispatch(res.body);
             })
-            .catch(() => {
+            .catch(err => {
                 dispatch({
                     type: actions.ADD_TO_SCHEDULE_FINISH,
                     success: false
                 });
+                dispatch(apiError(err));
             });
     };
 }

@@ -2,6 +2,7 @@
 import superagent from '../superagent-promise';
 import actions from './action-types';
 import { updateHistory } from './history';
+import { apiError } from './api';
 import * as clientConfig from '../client-config';
 
 export function toggleValve() {
@@ -18,17 +19,22 @@ export function toggleValve() {
             res.body.type = actions.TOGGLE_VALVE_FINISH;
             dispatch(res.body);
         })
-        .catch(() => {
+        .catch(err => {
             dispatch({
                 type: actions.TOGGLE_VALVE_FINISH,
                 success: false
             });
+            dispatch(apiError(err));
         });
    };
 }
 
-export function pollValve() {
+let polling = false;
+
+export function pollValve(internal) {
     return (dispatch,getState) => {
+        if (!internal && polling) return;
+        polling = true;
         const startTime = new Date();
         return superagent
             .get(`/api/1/poll-valve?open=${getState().valve.open}`)
@@ -43,10 +49,11 @@ export function pollValve() {
                     });
                     dispatch(updateHistory());
                 }
-                setTimeout(()=>dispatch(pollValve()),(new Date()).getTime() - startTime < 1000 ? 1000 : 0);
+                setTimeout(()=>dispatch(pollValve(true)),(new Date()).getTime() - startTime < 1000 ? 1000 : 0);
             })
-            .catch(() => {
-                setTimeout(()=>dispatch(pollValve()),(new Date()).getTime() - startTime < 1000 ? 1000 : 0);
+            .catch(err => {
+                polling = false;
+                dispatch(apiError(err));
             });
 
     };

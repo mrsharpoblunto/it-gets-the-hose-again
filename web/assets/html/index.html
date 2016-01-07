@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="/css/app.css" />
+    <link rel="stylesheet" type="text/css" href="/css/app.css?rev=1" />
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <title>It gets the hose again</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <meta name="mobile-web-app-capable" content="yes" />  
     <meta name="apple-mobile-web-app-capable" content="yes" />  
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="icon" type="image/png" href="/img/favicon.png" />
@@ -14,15 +15,15 @@
     <link href="/img/apple-icon-167.png" sizes="167x167" rel="apple-touch-icon-precomposed" />
     <link href="/img/apple-icon-180.png" sizes="180x180" rel="apple-touch-icon-precomposed" />
     <style>
-       @media all and (orientation:portrait) {*/
-            body.status-bar nav, 
-            body.status-bar nav .nav-wrapper i, 
-            body.status-bar nav a.button-collapse, 
-            body.status-bar nav a.button collapse {
+       @media all and (orientation:portrait) {
+            #app-container.status-bar nav, 
+            #app-container.status-bar nav .nav-wrapper i, 
+            #app-container.status-bar nav a.button-collapse, 
+            #app-container.status-bar nav a.button collapse {
                 line-height: 104px;
                 height: 84px;
             }
-            body.status-bar #mobile-nav {
+            #app-container.status-bar #mobile-nav {
                 top: 20px;
             }
         }
@@ -32,11 +33,11 @@
     <div id="app-container"></div>
     <script src="/vendor-jquery.js"></script>
     <script src="/vendor.js"></script>
-    <script src="/app.js"></script>
+    <script src="/app.js?rev=1"></script>
     <script>
         $(document).ready(function() {
            if (window.navigator.standalone) {
-               $("body").addClass("status-bar");
+               $("#app-container").addClass("status-bar");
            }
         });
     </script>

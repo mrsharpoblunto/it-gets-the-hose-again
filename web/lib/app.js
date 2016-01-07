@@ -5,6 +5,7 @@ import https from 'https';
 import fs from 'fs';
 import storage from 'node-persist';
 import hap from 'hap-nodejs';
+import uuid from 'node-uuid';
 
 import express from 'express';
 //express middleware
@@ -12,10 +13,12 @@ import morgan from 'morgan';
 import compression from 'compression';
 import errorHandler from 'errorhandler';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import winston from 'winston';
 
 import configureApiRoutes from './api';
 import pwauth from './pwauth';
+import { createSession, destroySession } from './session';
 import ValveController from './valve-controller';
 import Scheduler from './scheduler';
 import HistoryLogger from './history-logger';
@@ -41,10 +44,9 @@ app.use(morgan('combined',{ stream: {
   write: message => app.logger.verbose(message)
 }}));
 
+app.use(cookieParser(uuid.v4()));
 app.use(bodyParser.json());
-if (process.env.NODE_ENV === 'production') {
-    app.use(pwauth(app));
-} else {
+if (process.env.NODE_ENV !== 'production') {
     app.use(errorHandler({ dumpExceptions: true, showStack: true }));
 }
 
@@ -84,13 +86,43 @@ function configureRoutes(app) {
    * the app to try and handle requests coming from the client that are intended
    * for the webpack-dev-server
    */
-  app.get('/socket.io*',function(req,res) {
+  app.get('/socket.io*',(req,res)=> {
       const message = 'You are not running this application via webpack-dev-server. Browse to this application using the webpack-dev-server port to enable webpack support';
       app.logger.warn(message);
-      res.statusCode = 502;
-      res.write(message);
-      res.end();
+      res.status(502).send(message);
   });
+
+  app.post('/login',(req,res) => {
+        if (!req.body || !req.body.name || !req.body.password) {
+            return res.json({
+                success: false,
+                message: 'Required properties "name" and "password" were not present'
+            });
+        }
+
+        pwauth(req.body.name,req.body.password,(err,success) => {
+            if (err) {
+                app.logger.error(`Unable to authenticate via pwauth - ${err.stack}`);
+                res.sendStatus(500);
+            } else if (success) {
+                createSession(res);
+                res.json({
+                    success: true
+                });
+            } else {
+                app.logger.warn(`User ${req.body.name} failed authorization`);
+                res.json({
+                    success: false,
+                    message: 'Invalid user name or password'
+                });
+            }
+        });
+   }); 
+
+   app.get('/logout', (req,res) => {
+        destroySession(res);
+        res.redirect('/');
+   });
 
   /**
    * handle rendering of the UI
