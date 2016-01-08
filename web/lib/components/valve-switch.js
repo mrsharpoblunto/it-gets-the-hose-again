@@ -1,4 +1,5 @@
 import React from 'react';
+import tapOrClick from 'react-tap-or-click';
 import { connect } from 'react-redux';
 import { pollValve,toggleValve } from '../actions/valve';
 
@@ -17,7 +18,7 @@ export default class ValveSwitch extends React.Component {
         return (<div className='right switch'>
             <label>
                 Closed
-                <input type='checkbox' onClick={this.handleChange} checked={this.props.open}/>
+                <input type='checkbox' {...tapOrClick(this.handleChange)} checked={this.props.open}/>
                 <span className='lever'></span>
                 Open
             </label>

@@ -1,4 +1,5 @@
 import React from 'react';
+import tapOrClick from 'react-tap-or-click';
 import { connect } from 'react-redux';
 import { login } from '../actions/auth';
 import Logo from './logo';
@@ -53,7 +54,7 @@ export default class LoginComponent extends React.Component {
                         </div>
                         <div className='row'>
                             <div className='col s12 center'>
-                                <button className={'btn waves-effect waves-light '+(this.props.loading ? 'disabled': '')} type='submit' name='action' onClick={this.handleLogin}>{this.props.loading ? 'Logging in' : 'Login'}</button>
+                                <button className={'btn waves-effect waves-light '+(this.props.loading ? 'disabled': '')} type='submit' name='action' {...tapOrClick(this.handleLogin)}>{this.props.loading ? 'Logging in' : 'Login'}</button>
                             </div>
                         </div>
                     </form>

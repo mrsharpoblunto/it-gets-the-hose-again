@@ -1,4 +1,5 @@
 import React from 'react'
+import tapOrClick from 'react-tap-or-click';
 import { connect } from 'react-redux';
 import { getSchedule, removeFromSchedule, addToSchedule } from '../actions/schedule';
 
@@ -58,7 +59,7 @@ export default class ScheduleComponent extends React.Component {
                                     <td>{i.duration} Minute{i.duration > 1 ? 's': ''}</td>
                                     <td>{i.time === 0 ? '12' : (i.time > 12 ? (i.time - 12) : i.time)}.00 {i.time === 0 ? 'midnight' : (i.time === 12 ? ' noon' : (i.time > 12 ? 'p.m.' : 'a.m.'))}</td>
                                     <td>{i.frequency} Day{i.frequency > 1 ? 's': ''}</td>
-                                    <td width='24'><button style={{padding:'0 8px'}} onClick={this.handleDelete.bind(this,i.id) } className='btn-flat delete-btn'><i className='material-icons'>delete</i></button></td>
+                                    <td width='24'><button style={{padding:'0 8px'}} {...tapOrClick(this.handleDelete.bind(this,i.id))} className='btn-flat delete-btn'><i className='material-icons'>delete</i></button></td>
                                 </tr>);
                             })}
                         </tbody>
@@ -73,7 +74,7 @@ export default class ScheduleComponent extends React.Component {
                 </div>)}
 
                 <div className='fixed-action-btn' style={{'bottom': '24px', 'right': '24px'}}>
-                    <a onClick={this.handleShowAdd} className='btn-floating btn-large waves-effect waves-light'>
+                    <a {...tapOrClick(this.handleShowAdd)} className='btn-floating btn-large waves-effect waves-light'>
                         <i className='large material-icons'>add</i>
                     </a>
                 </div>
@@ -141,8 +142,8 @@ export default class ScheduleComponent extends React.Component {
                         </div>
                     </div>
                     <div className='modal-footer'>
-                        <a className={'modal-action waves-effect btn-flat'+(this.props.adding?' disabled':'')} onClick={this.handleCancel}>Cancel</a>
-                        <a className={'modal-action waves-effect btn-flat'+(this.props.adding?' disabled':'')}  onClick={this.handleAdd}>{this.props.adding ? 'Adding' : 'Add'}</a>
+                        <a className={'modal-action waves-effect btn-flat'+(this.props.adding?' disabled':'')} {...tapOrClick(this.handleCancel)}>Cancel</a>
+                        <a className={'modal-action waves-effect btn-flat'+(this.props.adding?' disabled':'')}  {...tapOrClick(this.handleAdd)}>{this.props.adding ? 'Adding' : 'Add'}</a>
                     </div>
                 </div>
             </div>);

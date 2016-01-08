@@ -1,4 +1,5 @@
 import React from 'react'
+import tapOrClick from 'react-tap-or-click';
 import { connect } from 'react-redux';
 
 import superagent from '../superagent-promise';
@@ -112,7 +113,7 @@ export default class SettingsComponent extends React.Component {
                         <p>
                             <input type='checkbox' id='checkWeather' className='filled-in' onChange={this.handleCheckWeather} checked={this.state.checkWeather} />
                             <label htmlFor='checkWeather'>Check weather</label>
-                            { this.state.checkWeather ? (<a className="waves-effect weather-btn btn-flat right" onClick={this.handleRefreshLocation}><i className='material-icons left'>refresh</i> Refresh</a>) : null }
+                            { this.state.checkWeather ? (<a className="waves-effect weather-btn btn-flat right" {...tapOrClick(this.handleRefreshLocation)}><i className='material-icons left'>refresh</i> Refresh</a>) : null }
                         </p>
                     </div>
                 </div>
