@@ -47,3 +47,15 @@ gulp serverw
 ```
 
 The build command only needs to be run once - this builds some frontend vendor dependancies and does not need to be re-run. The serverw command starts up the application server and watches for changes and restarts/hot-reloads as changes are detected. You should now be able to browse to the web UI on http://localhost:3001/.
+
+To run the tests, run
+
+```
+gulp tests
+```
+
+And to have the tests watch for file changes, run
+
+```
+gulp testsw
+```
