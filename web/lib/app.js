@@ -22,6 +22,7 @@ import ValveController from './valve-controller';
 import Scheduler from './scheduler';
 import HistoryLogger from './history-logger';
 import * as config from './config';
+import * as keys from '../keys';
 
 // configure express and its middleware
 const app = express();
@@ -71,11 +72,16 @@ app.valveController = new ValveController(
 
 // load the watering scheduler
 app.scheduler = new Scheduler(
+    keys.OPEN_WEATHER_API_KEY,
     app.storage,
     app.history,
     app.logger,
     app.valveController);
-app.scheduler.start();
+
+app.logger.info('Scheduler starting...');
+app.scheduler.start(false,() => {
+    app.logger.info('Scheduler running');
+});
 
 configureApiRoutes(app);
 configureRoutes(app);

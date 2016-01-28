@@ -1,6 +1,5 @@
 import superagent from './superagent-promise';
 import * as config from './config';
-import * as keys from '../keys';
 
 function systemTimer() {
     return {
@@ -11,7 +10,7 @@ function systemTimer() {
 }
 
 export default class Scheduler {
-    constructor(storage, history, logger, valveController, timer = systemTimer()) {
+    constructor(apiKey, storage, history, logger, valveController, timer = systemTimer()) {
         this.storage = storage;
         this.history = history;
         this.logger = logger;
@@ -20,10 +19,10 @@ export default class Scheduler {
         this.settings = {};
         this.schedule = [];
         this.waterUntil = 0;
+        this.apiKey = apiKey;
     }
 
-    start() {
-        this.logger.info('Scheduler starting...');
+    start(manualChecking,cb) {
         this._load(() => {
             this.valveController.on('setOpen', ({
                 open, source
@@ -41,9 +40,11 @@ export default class Scheduler {
                     }
                 }
             });
-            this._check();
-            this.checkHandle = setInterval(this._check, config.SCHEDULE_CHECK_INTERVAL);
-            this.logger.info('Scheduler running');
+            if (!manualChecking) {
+                this.check();
+                this.checkHandle = setInterval(this.check, config.SCHEDULE_CHECK_INTERVAL);
+            }
+            cb();
         });
     }
 
@@ -76,7 +77,7 @@ export default class Scheduler {
         });
     }
 
-    _check = () => {
+    check = (callback = function(){}) => {
         const now = this.timer.now();
         const currentHour = now.getHours();
         this.logger.verbose(`Checking schedule for hour ${currentHour}`);
@@ -103,33 +104,37 @@ export default class Scheduler {
                 items: this.schedule
             }, err => {
                 if (err) {
+                    callback();
                     return this.logger.error(`Unable to update schedule ${err.stack}`);
                 }
                 if (this.settings.location) {
                     this._checkWeather(this.settings.location, (shouldWater, weatherDesc) => {
                         if (!shouldWater) {
                             this.history.write(config.SCHEDULER, `Watering cancelled due to weather conditions - ${weatherDesc}`, () => {
-                                this._setValve(false);
+                                this._setValve(false,callback);
                                 this.waterUntil = 0;
                             });
                         } else {
-                            this._setValve(true);
+                            this._setValve(true,callback);
                         }
                     });
                 } else {
-                    this._setValve(true);
+                    this._setValve(true,callback);
                 }
             });
         } else if (this.waterUntil) {
-            this._setValve(this.waterUntil > now.getTime());
+            this._setValve(this.waterUntil > now.getTime(),callback);
+        } else {
+            callback();
         }
     }
 
-    _setValve(open) {
+    _setValve(open,callback) {
         this.valveController.setOpen(open, config.SCHEDULER, err => {
             if (err) {
                 this.logger.error(`Unable to set valve status ${err.stack}`);
             }
+            callback(err);
         });
     }
 
@@ -139,7 +144,7 @@ export default class Scheduler {
 
     _checkWeather(location, cb) {
         superagent
-            .get(`http://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=${keys.OPEN_WEATHER_API_KEY}`)
+            .get(`http://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=${this.apiKey}`)
             .accept('json')
             .end()
             .then(res => {
