@@ -22,6 +22,7 @@ import ValveController from './valve-controller';
 import Scheduler from './scheduler';
 import HistoryLogger from './history-logger';
 import * as config from './config';
+import * as clientConfig from './client-config'; 
 import * as keys from '../keys';
 
 // configure express and its middleware
@@ -148,7 +149,7 @@ function startHomekitServer(app) {
     accessory.publish({
         port: config.HOMEKIT_PORT,
         username: config.HOMEKIT_USERNAME,
-        pincode: config.HOMEKIT_PINCODE
+        pincode: clientConfig.HOMEKIT_PINCODE
     });
     app.logger.info('Published HomeKit Accessory Info');
 }
