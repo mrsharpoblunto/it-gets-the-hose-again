@@ -8,11 +8,10 @@
     "start": "node index.js",
     "test": "gulp tests"
   },
-  "engines": {
-    "node": "0.12.x",
-    "npm": "2.5.x"
-  },
   "dependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/register": "^7.9.0",
     "babel": "^5.8.21",
     "babel-runtime": "^5.8.24",
     "body-parser": "^1.19.0",

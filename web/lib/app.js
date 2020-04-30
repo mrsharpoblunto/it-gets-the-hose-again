@@ -3,7 +3,7 @@ import http from 'http';
 import https from 'https';
 import fs from 'fs';
 import storage from 'node-persist';
-import hap from 'hap-nodejs';
+import * as hap from 'hap-nodejs';
 import uuid from 'node-uuid';
 
 import express from 'express';
@@ -153,7 +153,7 @@ function configureRoutes(app) {
 
 function startHomekitServer(app) {
     hap.init();
-    const accessory = require('./valve-accessory')(app.valveController);
+    const accessory = require('./valve-accessory').default(app.valveController);
     accessory.publish({
         port: config.HOMEKIT_PORT,
         username: config.HOMEKIT_USERNAME,

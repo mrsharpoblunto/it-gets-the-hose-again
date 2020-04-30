@@ -1,6 +1,5 @@
-require('babel/register')({
-    stage: 0,
-    optional: ['runtime']
+require('@babel/register')({
+  'presets': [['@babel/preset-env',{ targets: { node: 'current' } }]]
 });
 
 // tidy up babels default stacktrace rendering

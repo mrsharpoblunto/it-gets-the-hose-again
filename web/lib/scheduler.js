@@ -43,7 +43,7 @@ export default class Scheduler {
             });
             if (!manualChecking) {
                 this.check();
-                this.checkHandle = setInterval(this.check, config.SCHEDULE_CHECK_INTERVAL);
+                this.checkHandle = setInterval(this.check.bind(this), config.SCHEDULE_CHECK_INTERVAL);
             }
             cb();
         });
@@ -75,7 +75,7 @@ export default class Scheduler {
         });
     }
 
-    check = (callback = function(){}) => {
+    check(callback = function(){}) {
         const now = this.timer.now();
         const currentHour = now.getHours();
         this.logger.verbose(`Checking schedule for hour ${currentHour}`);
