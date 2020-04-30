@@ -6,7 +6,7 @@ module.exports = {
     debug: false,
     entry: {
         app: [__dirname + '/assets/css/app.scss', __dirname + '/assets/js/app.js'],
-        vendor: ['react', 'react-dom', 'redux', 'react-redux', 'redux-logger', 'redux-thunk', 'superagent', 'moment']
+        vendor: ['react', 'react-dom', 'redux', 'react-redux', 'redux-logger', 'redux-thunk', 'moment']
     },
     output: {
         path: path.join(__dirname, 'public'),

@@ -6,7 +6,7 @@ module.exports = {
     debug: true,
     entry: {
         app: [__dirname + '/assets/css/app.scss', 'webpack-dev-server/client?', 'webpack/hot/dev-server', __dirname + '/assets/js/app.js'],
-        vendor: ['react', 'redux', 'react-redux', 'redux-logger', 'redux-thunk', 'react-dom', 'superagent', 'moment']
+        vendor: ['react', 'redux', 'react-redux', 'redux-logger', 'redux-thunk', 'react-dom', 'moment']
     },
     output: {
         path: path.join(__dirname, 'public'),

@@ -1,5 +1,4 @@
 'use strict'
-import superagent from '../superagent-promise';
 import actions from './action-types';
 import { updateHistory } from './history';
 import { apiError } from './api';
@@ -10,14 +9,11 @@ export function toggleValve() {
         dispatch({
             type: actions.TOGGLE_VALVE_START
         })
-        return superagent
-            .post('/api/1/toggle-valve')
-            .type('json')
-            .accept('json')
-            .end()
+        return fetch('/api/1/toggle-valve', { method: 'POST' })
+            .then(res => res.json())
             .then(res => {
-                res.body.type = actions.TOGGLE_VALVE_FINISH;
-                dispatch(res.body);
+                res.type = actions.TOGGLE_VALVE_FINISH;
+                dispatch(res);
             })
             .catch(err => {
                 dispatch({
@@ -36,24 +32,32 @@ export function pollValve(internal) {
         if (!internal && polling) return;
         polling = true;
         const startTime = new Date();
-        return superagent
-            .get(`/api/1/poll-valve?open=${getState().valve.open}`)
-            .accept('json')
-            .timeout(clientConfig.LONGPOLL_TIMEOUT + 5000)
-            .end()
+
+        const controller = new AbortController();
+        const abortTimeout = setTimeout(() => controller.abort(), clientConfig.LONGPOLL_TIMEOUT + 5000);
+        const pollNext = () => setTimeout(() => dispatch(pollValve(true)), (new Date()).getTime() - startTime < 1000 ? 1000 : 0);
+
+        return fetch(`/api/1/poll-valve?open=${getState().valve.open}`, { signal: controller.signal })
+            .then(res => res.json())
             .then(res => {
-                if (res.body.success && res.body.change) {
+                if (res.success && res.change) {
                     dispatch({
                         type: actions.SET_VALVE,
-                        open: res.body.open
+                        open: res.open
                     });
                     dispatch(updateHistory());
                 }
-                setTimeout(() => dispatch(pollValve(true)), (new Date()).getTime() - startTime < 1000 ? 1000 : 0);
+                pollNext();
             })
             .catch(err => {
+              if (err.name === 'AbortError') {
+                pollNext();
+              } else {
                 polling = false;
                 dispatch(apiError(err));
+              }
+            }).finally(() => {
+                clearTimeout(abortTimeout);
             });
 
     };

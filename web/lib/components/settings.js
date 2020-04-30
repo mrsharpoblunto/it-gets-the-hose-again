@@ -2,7 +2,6 @@ import React from 'react'
 import tapOrClick from 'react-tap-or-click';
 import { connect } from 'react-redux';
 
-import superagent from '../superagent-promise';
 import * as keys from '../../keys';
 import { getSettings, updateSettings } from '../actions/settings';
 import Loading from './loading';
@@ -153,18 +152,16 @@ class UserLocationComponent extends React.Component {
         if (!props.location) {
             this.findLocation();
         } else {
-            superagent
-                .get(`/api/1/weather?lat=${props.location.latitude}&lon=${props.location.longitude}`)
-                .accept('json')
-                .end()
-                .then(res => {
-                    if (res.body.success) {
-                        this.setState({ weather: res.body.weather });
-                    }
-                })
-                .catch(() => {
-                    this.setState({ weather: null });
-                });
+            fetch(`/api/1/weather?lat=${props.location.latitude}&lon=${props.location.longitude}`)
+              .then(res => res.json())
+              .then(res => {
+                  if (res.success) {
+                      this.setState({ weather: res.weather });
+                  }
+              })
+              .catch(() => {
+                  this.setState({ weather: null });
+              });
         }
     }
     findLocation = () => {

@@ -1,5 +1,5 @@
 import uuid from 'node-uuid';
-import superagent from './superagent-promise';
+import fetch from 'node-fetch';
 import * as keys from '../keys';
 import * as config from './config';
 import * as clientConfig from './client-config';
@@ -296,24 +296,22 @@ export default function(app) {
             });
         }
 
-        superagent
-            .get(`http://api.openweathermap.org/data/2.5/weather?lat=${req.query.lat}&lon=${req.query.lon}&appid=${keys.OPEN_WEATHER_API_KEY}`)
-            .accept('json')
-            .end()
-            .then(apiRes => {
-                const weather = apiRes.body.weather[0];
-                weather.icon = `https://openweathermap.org/img/w/${weather.icon}.png`;
-                res.json({
-                    success: true,
-                    weather
-                });
-            })
-            .catch(err => {
-                app.logger.error(`Unable to get weather information - ${err.stack}`);
-                res.json({
-                    success: false,
-                    message: 'Unable to contact Open Weather API'
-                });
+        fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${req.query.lat}&lon=${req.query.lon}&appid=${keys.OPEN_WEATHER_API_KEY}`)
+          .then(apiRes => apiRes.json())
+          .then(apiRes => {
+            const weather = apiRes.weather[0];
+            weather.icon = `https://openweathermap.org/img/w/${weather.icon}.png`;
+            res.json({
+                success: true,
+                weather
             });
+          })
+          .catch(err => {
+              app.logger.error(`Unable to get weather information - ${err.stack}`);
+              res.json({
+                  success: false,
+                  message: 'Unable to contact Open Weather API'
+              });
+          });
     });
 }

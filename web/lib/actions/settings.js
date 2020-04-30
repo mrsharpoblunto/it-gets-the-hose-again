@@ -1,6 +1,5 @@
 import actions from './action-types';
 import { apiError } from './api';
-import superagent from '../superagent-promise';
 
 export function getSettings() {
     return dispatch => {
@@ -8,13 +7,11 @@ export function getSettings() {
             type: actions.GET_SETTINGS_START
         });
 
-        superagent
-            .get('/api/1/settings')
-            .accept('json')
-            .end()
+        fetch('/api/1/settings')
+            .then(res => res.json())
             .then(res => {
-                res.body.type = actions.GET_SETTINGS_FINISH;
-                dispatch(res.body);
+                res.type = actions.GET_SETTINGS_FINISH;
+                dispatch(res);
             })
             .catch(err => {
                 dispatch({
@@ -32,14 +29,15 @@ export function updateSettings(settings) {
             type: actions.UPDATE_SETTINGS_START
         });
 
-        superagent
-            .post('/api/1/settings')
-            .accept('json')
-            .send(settings)
-            .end()
+        fetch('/api/1/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(settings)
+        })
+          .then(res => res.json())
             .then(res => {
-                res.body.type = actions.UPDATE_SETTINGS_FINISH;
-                dispatch(res.body);
+                res.type = actions.UPDATE_SETTINGS_FINISH;
+                dispatch(res);
             })
             .catch(err => {
                 dispatch({

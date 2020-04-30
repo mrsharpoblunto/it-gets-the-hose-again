@@ -1,4 +1,4 @@
-import superagent from './superagent-promise';
+import fetch from 'node-fetch';
 import * as config from './config';
 
 function systemTimer() {
@@ -10,8 +10,9 @@ function systemTimer() {
 }
 
 export default class Scheduler {
-    constructor(apiKey, storage, history, logger, valveController, timer = systemTimer()) {
+    constructor(apiKey, storage, history, logger, valveController, fetcher = fetch, timer = systemTimer()) {
         this.storage = storage;
+        this.fetcher = fetcher;
         this.history = history;
         this.logger = logger;
         this.valveController = valveController;
@@ -143,25 +144,23 @@ export default class Scheduler {
     }
 
     _checkWeather(location, cb) {
-        superagent
-            .get(`http://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=${this.apiKey}`)
-            .accept('json')
-            .end()
-            .then(res => {
-                // find if the code is any of the recognized weather types with rain
-                // from http://openweathermap.org/weather-conditions
-                const code = res.body.weather[0].id;
-                if ((code >= 200 && code <= 202) ||
-                    (code >= 300 && code <= 321) ||
-                    (code >= 500 && code <= 531)) {
-                    cb(false, res.body.weather[0].description);
-                } else {
-                    cb(true, null);
-                }
-            })
-            .catch(err => {
-                this.logger.error(`Unable to check weather status for current location - ${err.stack}`);
-                cb(true, null);
-            });
+        this.fetcher(`http://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=${this.apiKey}`)
+          .then(res => res.json())
+          .then(res => {
+              // find if the code is any of the recognized weather types with rain
+              // from http://openweathermap.org/weather-conditions
+              const code = res.weather[0].id;
+              if ((code >= 200 && code <= 202) ||
+                  (code >= 300 && code <= 321) ||
+                  (code >= 500 && code <= 531)) {
+                  cb(false, res.weather[0].description);
+              } else {
+                  cb(true, null);
+              }
+          })
+          .catch(err => {
+              this.logger.error(`Unable to check weather status for current location - ${err.stack}`);
+              cb(true, null);
+          });
     }
 }

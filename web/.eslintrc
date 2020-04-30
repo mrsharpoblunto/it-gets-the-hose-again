@@ -15,5 +15,8 @@
     },
     "ecmaFeatures": {
         "jsx": true
+    },
+    "globals": {
+        "AbortController": "readonly"
     }
 }

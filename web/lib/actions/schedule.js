@@ -1,18 +1,16 @@
 import actions from './action-types';
 import { apiError } from './api';
-import superagent from '../superagent-promise';
 
 export function getSchedule() {
     return dispatch => {
         dispatch({
             type: actions.GET_SCHEDULE_START
         });
-        superagent
-            .get('/api/1/schedule')
-            .end()
+        fetch('/api/1/schedule')
+            .then(res => res.json())
             .then(res => {
-                res.body.type = actions.GET_SCHEDULE_FINISH;
-                dispatch(res.body);
+                res.type = actions.GET_SCHEDULE_FINISH;
+                dispatch(res);
             })
             .catch(err => {
                 dispatch({
@@ -30,13 +28,14 @@ export function removeFromSchedule(id) {
             type: actions.REMOVE_FROM_SCHEDULE_START,
             id
         });
-        superagent
-            .del('/api/1/schedule/' + id)
-            .end()
+        fetch('/api/1/schedule/' + id, {
+          method: 'DELETE'
+        })
+            .then(res => res.json())
             .then(res => {
-                res.body.type = actions.REMOVE_FROM_SCHEDULE_FINISH;
-                res.body.id = id;
-                dispatch(res.body);
+                res.type = actions.REMOVE_FROM_SCHEDULE_FINISH;
+                res.id = id;
+                dispatch(res);
             })
             .catch(err => {
                 dispatch({
@@ -54,25 +53,26 @@ export function addToSchedule(duration, time, frequency) {
         dispatch({
             type: actions.ADD_TO_SCHEDULE_START
         });
-        superagent
-            .post('/api/1/schedule')
-            .accept('json')
-            .send({
-                duration,
-                time,
-                frequency
-            })
-            .end()
-            .then(res => {
-                res.body.type = actions.ADD_TO_SCHEDULE_FINISH;
-                dispatch(res.body);
-            })
-            .catch(err => {
-                dispatch({
-                    type: actions.ADD_TO_SCHEDULE_FINISH,
-                    success: false
-                });
-                dispatch(apiError(err));
-            });
+        fetch('/api/1/schedule', {
+          method: 'POST',
+          body: JSON.stringify({
+              duration,
+              time,
+              frequency
+          }),
+          headers: { 'Content-Type': 'application/json' }
+        })
+          .then(res => res.json())
+          .then(res => {
+              res.type = actions.ADD_TO_SCHEDULE_FINISH;
+              dispatch(res);
+          })
+          .catch(err => {
+              dispatch({
+                  type: actions.ADD_TO_SCHEDULE_FINISH,
+                  success: false
+              });
+              dispatch(apiError(err));
+          });
     };
 }

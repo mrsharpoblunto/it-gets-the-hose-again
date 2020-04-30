@@ -1,6 +1,5 @@
 import actions from './action-types';
 import { apiError } from './api';
-import superagent from '../superagent-promise';
 
 export function updateHistory() {
     return (dispatch, getState) => {
@@ -9,16 +8,14 @@ export function updateHistory() {
         });
 
         const after = getState().history.latest;
-        superagent
-            .get(`/api/1/history${after?('?after='+after):''}`)
-            .accept('json')
-            .end()
-            .then(res => {
-                res.body.type = actions.GET_HISTORY_FINISH;
-                dispatch(res.body);
-            })
-            .catch(err => {
-                dispatch(apiError(err));
-            });
+        fetch(`/api/1/history${after?('?after='+after):''}`)
+          .then(res => res.json())
+          .then(res => {
+              res.type = actions.GET_HISTORY_FINISH;
+              dispatch(res);
+          })
+          .catch(err => {
+              dispatch(apiError(err));
+          });
     };
 }
