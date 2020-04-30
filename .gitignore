@@ -26,4 +26,4 @@ node_modules
 web/keys.js
 web/public
 web/ssl
-web/persist
+web/.node-persist

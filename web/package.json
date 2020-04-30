@@ -23,7 +23,7 @@
     "hap-nodejs": "^0.6.10",
     "morgan": "^1.5.0",
     "node-fetch": "^2.6.0",
-    "node-persist": "0.0.8",
+    "node-persist": "^3.0.5",
     "node-uuid": "^1.4.7",
     "onoff": "^1.0.3",
     "winston": "^1.0.1"

@@ -18,12 +18,12 @@ class NullStorage {
     constructor(storage = {}) {
         this._storage = storage;
     }
-    getItem(key,callback) {
-        callback(null,this._storage[key]);
+    getItem(key) {
+        return Promise.resolve(this._storage[key]);
     }
-    setItem(key,value,callback) {
-        this._storage[key] = value;
-        callback();
+    setItem(key,value) {
+      this._storage[key] = value;
+      return Promise.resolve();
     }
 }
 

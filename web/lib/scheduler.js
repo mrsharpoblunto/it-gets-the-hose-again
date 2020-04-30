@@ -60,21 +60,18 @@ export default class Scheduler {
     }
 
     _load(cb) {
-        this.storage.getItem(config.SETTINGS_KEY, (err, settings) => {
-            if (err) {
-                this.logger.error(`Unable to load settings ${err.stack}`);
-            }
+        this.storage.getItem(config.SETTINGS_KEY).then(settings => {
             this.settings = settings || {};
-
-            this.storage.getItem(config.SCHEDULE_KEY, (err, schedule) => {
-                if (err) {
-                    this.logger.error(`Unable to load schedule ${err.stack}`);
-                }
-                this.schedule = schedule ? schedule.items : [];
-                if (cb) {
-                    cb();
-                }
-            });
+            return this.storage.getItem(config.SCHEDULE_KEY);
+        })
+        .then(schedule => {
+          this.schedule = schedule ? schedule.items : [];
+          if (cb) {
+              cb();
+          }
+        })
+        .catch(err => {
+          this.logger.error(`Unable to load schedule ${err.stack}`);
         });
     }
 
@@ -103,11 +100,7 @@ export default class Scheduler {
         if (updated) {
             this.storage.setItem(config.SCHEDULE_KEY, {
                 items: this.schedule
-            }, err => {
-                if (err) {
-                    callback();
-                    return this.logger.error(`Unable to update schedule ${err.stack}`);
-                }
+            }).then(() => {
                 if (this.settings.location) {
                     this._checkWeather(this.settings.location, (shouldWater, weatherDesc) => {
                         if (!shouldWater) {
@@ -122,6 +115,9 @@ export default class Scheduler {
                 } else {
                     this._setValve(true,callback);
                 }
+            }).catch(err => {
+              this.logger.error(`Unable to update schedule ${err.stack}`);
+              callback();
             });
         } else if (this.waterUntil) {
             this._setValve(this.waterUntil > now.getTime(),callback);

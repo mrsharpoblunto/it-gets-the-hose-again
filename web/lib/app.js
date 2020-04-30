@@ -58,36 +58,36 @@ if (process.env.NODE_ENV !== 'production') {
 
 // setup storage engine
 app.storage = storage;
-storage.initSync();
+storage.init().then(() => {
+  // create the history logger
+  app.history = new HistoryLogger(
+      app.storage,
+      app.logger,
+      config.MAX_HISTORY_ITEMS);
 
-// create the history logger
-app.history = new HistoryLogger(
-    app.storage,
-    app.logger,
-    config.MAX_HISTORY_ITEMS);
+  // create the valve controller
+  app.valveController = new ValveController(
+      app.history,
+      app.logger);
 
-// create the valve controller
-app.valveController = new ValveController(
-    app.history,
-    app.logger);
+  // load the watering scheduler
+  app.scheduler = new Scheduler(
+      keys.OPEN_WEATHER_API_KEY,
+      app.storage,
+      app.history,
+      app.logger,
+      app.valveController);
 
-// load the watering scheduler
-app.scheduler = new Scheduler(
-    keys.OPEN_WEATHER_API_KEY,
-    app.storage,
-    app.history,
-    app.logger,
-    app.valveController);
+  app.logger.info('Scheduler starting...');
+  app.scheduler.start(false,() => {
+      app.logger.info('Scheduler running');
+  });
 
-app.logger.info('Scheduler starting...');
-app.scheduler.start(false,() => {
-    app.logger.info('Scheduler running');
+  configureApiRoutes(app);
+  configureRoutes(app);
+  startHomekitServer(app);
+  startServer(app);
 });
-
-configureApiRoutes(app);
-configureRoutes(app);
-startHomekitServer(app);
-startServer(app);
 
 function configureRoutes(app) {
     app.use(express.static(path.join(__dirname, '..', 'public'), config.PUBLIC_STATIC_CACHING));

@@ -5294,11 +5294,6 @@ mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkd
   dependencies:
     minimist "^1.2.5"
 
-mkdirp@~0.3.5:
-  version "0.3.5"
-  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.3.5.tgz#de3e5f8961c88c787ee1368df849ac4413eca8d7"
-  integrity sha1-3j5fiWHIjHh+4TaN+EmsRBPsqNc=
-
 mocha@^2.0.1, mocha@^2.3.3:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/mocha/-/mocha-2.5.3.tgz#161be5bdeb496771eb9b35745050b622b5aefc58"
@@ -5493,14 +5488,6 @@ node-libs-browser@^0.7.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
-node-persist@0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/node-persist/-/node-persist-0.0.8.tgz#a56c739bc6ffd9ceef19c0e8d89597917f089249"
-  integrity sha1-pWxzm8b/2c7vGcDo2JWXkX8Ikkk=
-  dependencies:
-    mkdirp "~0.3.5"
-    q "~1.1.1"
-
 node-persist@^0.0.11:
   version "0.0.11"
   resolved "https://registry.yarnpkg.com/node-persist/-/node-persist-0.0.11.tgz#d66eba3ebef620f079530fa7b13076a906665874"
@@ -5508,6 +5495,13 @@ node-persist@^0.0.11:
   dependencies:
     mkdirp "~0.5.1"
     q "~1.1.1"
+
+node-persist@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/node-persist/-/node-persist-3.0.5.tgz#ee6128df8e0f9ea45ea80090b8dd9dd338408900"
+  integrity sha512-zJmBA58kI9QAxXLMc4NLswgzXVIqKfsfQtiySMF6eEQ3kVvoM3YHzcP0//L9u30Fqx3cYe1FL/a+fyB3VwO/oQ==
+  dependencies:
+    mkdirp "~0.5.1"
 
 node-sass@^3.4.2:
   version "3.13.1"

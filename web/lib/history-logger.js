@@ -7,11 +7,8 @@ export default class HistoryLogger {
         this.maxItems = maxItems;
     }
     write(source, message, cb) {
-        this.storage.getItem(config.HISTORY_KEY, (err, value) => {
-            if (err) {
-                this.logger.error('Unable to get history items');
-                return cb(err);
-            } else if (!value) {
+        this.storage.getItem(config.HISTORY_KEY).then(value => {
+            if (!value) {
                 value = {
                     items: []
                 };
@@ -28,13 +25,12 @@ export default class HistoryLogger {
             }
             value.items.unshift(newItem);
 
-            this.storage.setItem(config.HISTORY_KEY, value, err => {
-                if (err) {
-                    this.logger.error('Unable to set history items');
-                    return cb(err);
-                }
-                cb();
-            });
-        });
+            return this.storage.setItem(config.HISTORY_KEY, value);
+        })
+        .then(() => cb())
+        .catch(err => {
+          this.logger.error('Unable to set history items');
+          return cb(err);
+        })
     }
 }

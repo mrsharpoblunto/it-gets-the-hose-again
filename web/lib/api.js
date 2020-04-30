@@ -67,55 +67,48 @@ export default function(app) {
     });
 
     app.get('/api/1/history', (req, res) => {
-        app.storage.getItem(config.HISTORY_KEY, (err, value) => {
-            if (err) {
-                app.logger.error(`Unable to get history items - ${err.stack}`);
-                res.status(500).json({
-                    success: false
-                });
-            } else if (!value) {
-                res.json({
-                    items: [],
-                    latest: null,
-                    success: true
-                });
-            } else {
-                let items = value.items;
-                if (req.query.after) {
-                    items = items.filter(i => i.id > req.query.after);
-                }
-                res.json({
-                    items,
-                    latest: items.length > 0 ? items[0].id : null,
-                        success: true
-                });
-            }
+        app.storage.getItem(config.HISTORY_KEY).then(value => {
+          if (!value) {
+              res.json({
+                  items: [],
+                  latest: null,
+                  success: true
+              });
+          } else {
+              let items = value.items;
+              if (req.query.after) {
+                  items = items.filter(i => i.id > req.query.after);
+              }
+              res.json({
+                  items,
+                  latest: items.length > 0 ? items[0].id : null,
+                      success: true
+              });
+          }
+        }).catch(err => {
+          app.logger.error(`Unable to get history items - ${err.stack}`);
+          res.status(500).json({
+              success: false
+          });
         });
     });
 
     app.get('/api/1/schedule', (req, res) => {
-        app.storage.getItem(config.SCHEDULE_KEY, (err, value) => {
-            if (err) {
-                app.logger.error(`Unable to get schedule items - ${err.stack}`);
-                return res.status(500).json({
-                    success: false
-                });
-            }
+        app.storage.getItem(config.SCHEDULE_KEY).then(value => {
             res.json({
                 items: value ? value.items : [],
                 success: true
             });
+        }).catch(err => {
+          app.logger.error(`Unable to get schedule items - ${err.stack}`);
+          return res.status(500).json({
+              success: false
+          });
         });
     });
 
     app.delete('/api/1/schedule/:id', (req, res) => {
-        app.storage.getItem(config.SCHEDULE_KEY, (err, value) => {
-            if (err) {
-                app.logger.error(`Unable to get schedule items - ${err.stack}`);
-                return res.status(500).json({
-                    success: false
-                });
-            }
+        app.storage.getItem(config.SCHEDULE_KEY).then(value => {
             value = value || {
                 items: []
             };
@@ -123,18 +116,19 @@ export default function(app) {
             value.items = value.items.filter(item => {
                 return item.id !== req.params.id
             });
-            app.storage.setItem(config.SCHEDULE_KEY, value, err => {
-                if (err) {
-                    app.logger.error(`Unable to set schedule items ${err.stack}`);
-                    return res.status(500).json({
-                        success: false
-                    });
-                }
-                app.scheduler.reload();
-                res.json({
-                    success: true
-                });
+            return app.storage.setItem(config.SCHEDULE_KEY, value);
+        })
+        .then(() => {
+            app.scheduler.reload();
+            res.json({
+                success: true
             });
+        })
+        .catch(err => {
+          app.logger.error(`Unable to set schedule items - ${err.stack}`);
+          return res.status(500).json({
+              success: false
+          });
         });
     });
 
@@ -174,31 +168,26 @@ export default function(app) {
             frequency: req.body.frequency
         };
 
-        app.storage.getItem(config.SCHEDULE_KEY, (err, value) => {
-            if (err) {
-                app.logger.error(`Unable to get schedule items - ${err.stack}`);
-                return res.status(500).json({
-                    success: false
-                });
-            }
+        app.storage.getItem(config.SCHEDULE_KEY).then(value => {
             value = value || {
                 items: [],
                 waterUntil: 0
             };
             value.items.push(newItem);
-            app.storage.setItem(config.SCHEDULE_KEY, value, err => {
-                if (err) {
-                    app.logger.error(`Unable to set schedule items - ${err.stack}`);
-                    return res.status(500).json({
-                        success: false
-                    });
-                }
-                app.scheduler.reload();
-                res.json({
-                    success: true,
-                    newItem
-                });
+            return app.storage.setItem(config.SCHEDULE_KEY, value);
+        })
+        .then(() => {
+            app.scheduler.reload();
+            res.json({
+                success: true,
+                newItem
             });
+        })
+        .catch(err => {
+          app.logger.error(`Unable to set schedule items - ${err.stack}`);
+          return res.status(500).json({
+              success: false
+          });
         });
     });
 
@@ -210,17 +199,16 @@ export default function(app) {
     }
 
     app.get('/api/1/settings', (req, res) => {
-        app.storage.getItem(config.SETTINGS_KEY, (err, settings) => {
-            if (err) {
-                app.logger.error(`Unable to get settings - ${err.stack}`);
-                return res.status(500).json({
-                    success: false
-                });
-            }
+        app.storage.getItem(config.SETTINGS_KEY).then(settings => {
             res.json({
                 success: true,
                 settings: settings || getDefaultSettings()
             });
+        }).catch(err => {
+          app.logger.error(`Unable to get settings - ${err.stack}`);
+          return res.status(500).json({
+              success: false
+          });
         });
     });
 
@@ -232,14 +220,7 @@ export default function(app) {
             });
         }
 
-        app.storage.getItem(config.SETTINGS_KEY, (err, settings) => {
-            if (err) {
-                app.logger.error(`Unable to get settings - ${err.stack}`);
-                return res.status(500).json({
-                    success: false
-                });
-            }
-
+        app.storage.getItem(config.SETTINGS_KEY).then(settings => {
             if (!settings) {
                 settings = getDefaultSettings();
             }
@@ -265,19 +246,18 @@ export default function(app) {
             }
 
 
-            app.storage.setItem(config.SETTINGS_KEY, settings, err => {
-                if (err) {
-                    app.logger.error(`Unable to apply settings - ${err.stack}`);
-                    return res.status(500).json({
-                        success: false
-                    });
-                }
+            return app.storage.setItem(config.SETTINGS_KEY, settings).then(() => {
                 app.scheduler.reload();
                 res.json({
                     success: true,
                     settings
                 });
             });
+        }).catch(err => {
+          app.logger.error(`Unable to set settings - ${err.stack}`);
+          return res.status(500).json({
+              success: false
+          });
         });
     });
 
