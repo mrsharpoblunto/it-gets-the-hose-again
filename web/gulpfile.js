@@ -36,7 +36,7 @@ var webpackStatsOptions = {
 
 var args = [];
 if (process.env.NODE_ENV !== 'production') {
-    args.push('--debug');
+    args.push('--inspect');
 }
 args.push('index.js');
 var node = new Restartable('node', args);

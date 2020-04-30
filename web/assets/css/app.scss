@@ -13,8 +13,8 @@ $secondary-color: color("green","accent-3");
 $bg-color: color("grey","darken-3");
 $bg-text-color: #ffffff;
 
-$roboto-font-path: "../../node_modules/materialize-css/font/roboto/";
-$icons-font-path: "../../node_modules/materialize-css/font/material-design-icons/";
+$roboto-font-path: "../../node_modules/materialize-css/fonts/roboto/";
+$icons-font-path: "../../node_modules/materialize-css/fonts/material-design-icons/";
 @import "node_modules/materialize-css/sass/materialize.scss";
 
 html,body,#app-container {

@@ -1,4 +1,4 @@
-import hap from 'hap-nodejs';
+import * as hap from 'hap-nodejs';
 import * as config from './config';
 
 export default function(valveController) {
