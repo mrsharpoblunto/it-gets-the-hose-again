@@ -32,18 +32,24 @@ app.set('port', config.APP_SERVER_PORT);
 app.use(compression());
 
 // configure logging
-app.logger = new(winston.Logger)({
-    transports: [
-        new winston.transports.Console({
-            level: config.LOG_LEVEL,
-            colorize: true,
-            timestamp: true
-        })
-    ]
+app.logger = winston.createLogger({
+
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.timestamp(),
+    winston.format.printf(info => `${info.timestamp} - ${info.level}: ${info.message}`)
+  ),
+  transports: [
+      new winston.transports.Console({
+          level: config.LOG_LEVEL
+      })
+  ]
 });
 app.use(morgan('combined', {
     stream: {
-        write: message => app.logger.verbose(message)
+        write: message => {
+          app.logger.verbose(message)
+        }
     }
 }));
 
@@ -58,7 +64,9 @@ if (process.env.NODE_ENV !== 'production') {
 
 // setup storage engine
 app.storage = storage;
-storage.init().then(() => {
+storage.init({
+  dir: 'persist'
+}).then(() => {
   // create the history logger
   app.history = new HistoryLogger(
       app.storage,

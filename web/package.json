@@ -21,12 +21,12 @@
     "errorhandler": "^1.5.1",
     "express": "^4.17.1",
     "hap-nodejs": "^0.6.10",
-    "morgan": "^1.5.0",
+    "morgan": "^1.10.0",
     "node-fetch": "^2.6.0",
     "node-persist": "^3.0.5",
     "node-uuid": "^1.4.7",
     "onoff": "^1.0.3",
-    "winston": "^1.0.1"
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "babel-core": "^5.8.25",
