@@ -66,8 +66,9 @@ export default function(app) {
         });
     });
 
-    app.get('/api/1/history', (req, res) => {
-        app.storage.getItem(config.HISTORY_KEY).then(value => {
+    app.get('/api/1/history', async (req, res) => {
+        try {
+          const value = await app.storage.getItem(config.HISTORY_KEY);
           if (!value) {
               res.json({
                   items: [],
@@ -85,30 +86,32 @@ export default function(app) {
                       success: true
               });
           }
-        }).catch(err => {
+        } catch(err) {
           app.logger.error(`Unable to get history items - ${err.stack}`);
           res.status(500).json({
               success: false
           });
-        });
+        }
     });
 
-    app.get('/api/1/schedule', (req, res) => {
-        app.storage.getItem(config.SCHEDULE_KEY).then(value => {
-            res.json({
-                items: value ? value.items : [],
-                success: true
-            });
-        }).catch(err => {
-          app.logger.error(`Unable to get schedule items - ${err.stack}`);
-          return res.status(500).json({
-              success: false
-          });
+    app.get('/api/1/schedule', async (req, res) => {
+      try {
+        const value = await app.storage.getItem(config.SCHEDULE_KEY)
+        res.json({
+            items: value ? value.items : [],
+            success: true
         });
+      } catch(err) {
+        app.logger.error(`Unable to get schedule items - ${err.stack}`);
+        res.status(500).json({
+            success: false
+        });
+      }
     });
 
-    app.delete('/api/1/schedule/:id', (req, res) => {
-        app.storage.getItem(config.SCHEDULE_KEY).then(value => {
+    app.delete('/api/1/schedule/:id', async (req, res) => {
+      try {
+        const value = app.storage.getItem(config.SCHEDULE_KEY);
             value = value || {
                 items: []
             };
@@ -116,23 +119,20 @@ export default function(app) {
             value.items = value.items.filter(item => {
                 return item.id !== req.params.id
             });
-            return app.storage.setItem(config.SCHEDULE_KEY, value);
-        })
-        .then(() => {
-            app.scheduler.reload();
-            res.json({
-                success: true
-            });
-        })
-        .catch(err => {
-          app.logger.error(`Unable to set schedule items - ${err.stack}`);
-          return res.status(500).json({
-              success: false
-          });
+        await app.storage.setItem(config.SCHEDULE_KEY, value);
+        app.scheduler.reload();
+        res.json({
+            success: true
         });
+      } catch(err) {
+        app.logger.error(`Unable to set schedule items - ${err.stack}`);
+        res.status(500).json({
+            success: false
+        });
+      }
     });
 
-    app.post('/api/1/schedule', (req, res) => {
+    app.post('/api/1/schedule', async (req, res) => {
         if (!req.body) {
             return res.status(400).json({
                 success: false,
@@ -168,27 +168,26 @@ export default function(app) {
             frequency: req.body.frequency
         };
 
-        app.storage.getItem(config.SCHEDULE_KEY).then(value => {
-            value = value || {
-                items: [],
-                waterUntil: 0
-            };
-            value.items.push(newItem);
-            return app.storage.setItem(config.SCHEDULE_KEY, value);
-        })
-        .then(() => {
-            app.scheduler.reload();
-            res.json({
-                success: true,
-                newItem
-            });
-        })
-        .catch(err => {
-          app.logger.error(`Unable to set schedule items - ${err.stack}`);
-          return res.status(500).json({
-              success: false
-          });
+      try {
+        const value = await app.storage.getItem(config.SCHEDULE_KEY);
+        value = value || {
+            items: [],
+            waterUntil: 0
+        };
+        value.items.push(newItem);
+        await app.storage.setItem(config.SCHEDULE_KEY, value);
+
+        app.scheduler.reload();
+        res.json({
+            success: true,
+            newItem
         });
+      } catch(err) {
+        app.logger.error(`Unable to set schedule items - ${err.stack}`);
+        res.status(500).json({
+            success: false
+        });
+      }
     });
 
     function getDefaultSettings() {
@@ -198,21 +197,22 @@ export default function(app) {
         };
     }
 
-    app.get('/api/1/settings', (req, res) => {
-        app.storage.getItem(config.SETTINGS_KEY).then(settings => {
-            res.json({
-                success: true,
-                settings: settings || getDefaultSettings()
-            });
-        }).catch(err => {
-          app.logger.error(`Unable to get settings - ${err.stack}`);
-          return res.status(500).json({
-              success: false
-          });
+    app.get('/api/1/settings', async (req, res) => {
+      try {
+        const settings = await app.storage.getItem(config.SETTINGS_KEY);
+        res.json({
+            success: true,
+            settings: settings || getDefaultSettings()
         });
+      } catch(err) {
+        app.logger.error(`Unable to get settings - ${err.stack}`);
+        res.status(500).json({
+            success: false
+        });
+      }
     });
 
-    app.post('/api/1/settings', (req, res) => {
+    app.post('/api/1/settings', async (req, res) => {
         if (!req.body) {
             return res.status(400).json({
                 success: false,
@@ -220,48 +220,48 @@ export default function(app) {
             });
         }
 
-        app.storage.getItem(config.SETTINGS_KEY).then(settings => {
-            if (!settings) {
-                settings = getDefaultSettings();
-            }
+        try {
+          const settings = await app.storage.getItem(config.SETTINGS_KEY);
+          if (!settings) {
+              settings = getDefaultSettings();
+          }
 
-            if (typeof(req.body.shutoffDuration) !== 'undefined') {
-                if (typeof(req.body.shutoffDuration) !== 'number' || req.body.shutoffDuration < 0 || req.body.duration >= 60) {
-                    return res.status(400).json({
-                        success: false,
-                        message: 'Optional field "shutoffDuration" is not a Number between 0 and 60'
-                    });
-                }
-                settings.shutoffDuration = req.body.shutoffDuration;
-            }
+          if (typeof(req.body.shutoffDuration) !== 'undefined') {
+              if (typeof(req.body.shutoffDuration) !== 'number' || req.body.shutoffDuration < 0 || req.body.duration >= 60) {
+                  return res.status(400).json({
+                      success: false,
+                      message: 'Optional field "shutoffDuration" is not a Number between 0 and 60'
+                  });
+              }
+              settings.shutoffDuration = req.body.shutoffDuration;
+          }
 
-            if (typeof(req.body.location) !== 'undefined') {
-                if (req.body.location !== null && (typeof(req.body.location.latitude) !== 'number' || typeof(req.body.location.longitude) !== 'number')) {
-                    return res.status(400).json({
-                        success: false,
-                        message: 'Optional field "location" is not a latitude/longitude coordinate pair'
-                    });
-                }
-                settings.location = req.body.location;
-            }
+          if (typeof(req.body.location) !== 'undefined') {
+              if (req.body.location !== null && (typeof(req.body.location.latitude) !== 'number' || typeof(req.body.location.longitude) !== 'number')) {
+                  return res.status(400).json({
+                      success: false,
+                      message: 'Optional field "location" is not a latitude/longitude coordinate pair'
+                  });
+              }
+              settings.location = req.body.location;
+          }
 
 
-            return app.storage.setItem(config.SETTINGS_KEY, settings).then(() => {
-                app.scheduler.reload();
-                res.json({
-                    success: true,
-                    settings
-                });
-            });
-        }).catch(err => {
+          await app.storage.setItem(config.SETTINGS_KEY, settings);
+          app.scheduler.reload();
+          res.json({
+              success: true,
+              settings
+          });
+        } catch(err) {
           app.logger.error(`Unable to set settings - ${err.stack}`);
-          return res.status(500).json({
+          res.status(500).json({
               success: false
           });
-        });
+        }
     });
 
-    app.get('/api/1/weather', (req, res) => {
+    app.get('/api/1/weather', async (req, res) => {
         if (!req.query.lat) {
             return res.json({
                 success: false,
@@ -276,22 +276,21 @@ export default function(app) {
             });
         }
 
-        fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${req.query.lat}&lon=${req.query.lon}&appid=${keys.OPEN_WEATHER_API_KEY}`)
-          .then(apiRes => apiRes.json())
-          .then(apiRes => {
-            const weather = apiRes.weather[0];
-            weather.icon = `https://openweathermap.org/img/w/${weather.icon}.png`;
-            res.json({
-                success: true,
-                weather
-            });
-          })
-          .catch(err => {
-              app.logger.error(`Unable to get weather information - ${err.stack}`);
-              res.json({
-                  success: false,
-                  message: 'Unable to contact Open Weather API'
-              });
-          });
+      try {
+        const apiRes = await fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${req.query.lat}&lon=${req.query.lon}&appid=${keys.OPEN_WEATHER_API_KEY}`)
+        const json = await apiRes.json();
+        const weather = json.weather[0];
+        weather.icon = `https://openweathermap.org/img/w/${weather.icon}.png`;
+        res.json({
+            success: true,
+            weather
+        });
+      } catch(err) {
+        app.logger.error(`Unable to get weather information - ${err.stack}`);
+        res.json({
+            success: false,
+            message: 'Unable to contact Open Weather API'
+        });
+      }
     });
 }

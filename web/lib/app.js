@@ -64,9 +64,12 @@ if (process.env.NODE_ENV !== 'production') {
 
 // setup storage engine
 app.storage = storage;
-storage.init({
-  dir: 'persist'
-}).then(() => {
+(async () => {
+  await storage.init({
+    dir: 'persist',
+    forgiveParseErrors:true
+  });
+
   // create the history logger
   app.history = new HistoryLogger(
       app.storage,
@@ -87,15 +90,14 @@ storage.init({
       app.valveController);
 
   app.logger.info('Scheduler starting...');
-  app.scheduler.start(false,() => {
-      app.logger.info('Scheduler running');
-  });
+  await app.scheduler.start(false);
+  app.logger.info('Scheduler running');
 
   configureApiRoutes(app);
   configureRoutes(app);
   startHomekitServer(app);
   startServer(app);
-});
+})();
 
 function configureRoutes(app) {
     app.use(express.static(path.join(__dirname, '..', 'public'), config.PUBLIC_STATIC_CACHING));

@@ -66,44 +66,55 @@ export default class ValveController extends EventEmitter {
             flash();
         }
     }
-    _setOpen(open, source, cb) {
-        if (open === this.open) {
-            return cb(null, {
-                open, source
-            });
-        }
 
-        this.logger.verbose(`Valve set by ${source} to ${open?'open':'closed'}`);
-        this.history.write(source, open ? 'Watering started' : 'Watering stopped', err => {
-            if (err) {
-                this.logger.error('Unable to write history item');
-                return cb(err);
-            }
-            this.open = open
-            this.emit('setOpen', {
-                open, source
-            });
-            cb(null, {
-                open, source
-            });
-        });
+    async _setOpen(open, source) {
+      if (open === this.open) {
+          return {
+              open, source
+          };
+      }
+
+      this.logger.verbose(`Valve set by ${source} to ${open?'open':'closed'}`);
+      try {
+        await this.history.write(source, open ? 'Watering started' : 'Watering stopped');
+      } catch (err) {
+        this.logger.error('Unable to write history item');
+        throw err;
+      }
+      this.open = open
+      this.emit('setOpen', {
+          open, source
+      });
+      return {
+          open, source
+      };
     }
-    toggleOpen(source, cb) {
-        this.setOpen(!this.getOpen(), source, cb);
+
+    async toggleOpen(source) {
+        return await this.setOpen(!this.getOpen(), source);
     }
-    setOpen(open, source, cb) {
+
+    async setOpen(open, source) {
         if (this.valveGpio) {
-            this.valveGpio.write(open ? 1 : 0, err => {
+          try {
+            await new Promise((resolve, reject) => {
+              this.valveGpio.write(open ? 1 : 0, err => {
                 if (err) {
-                    this.logger.error(`Unable to change Valve state ${err.stack}`);
-                    return cb(err);
+                  reject(err);
+                } else {
+                  resolve();
                 }
-                this._setOpen(open, source, cb);
+              });
             });
+            return await this._setOpen(open, source);
+          } catch (err) {
+            throw err;
+          }
         } else {
-            this._setOpen(open, source, cb);
+            return await this._setOpen(open, source);
         }
     }
+
     getOpen() {
         this.logger.verbose(`Retrieved Valve state: ${this.open?'open':'closed'}`);
         return this.open;

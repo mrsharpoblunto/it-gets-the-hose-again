@@ -28,8 +28,7 @@ class NullStorage {
 }
 
 class NullHistory {
-    write(source,message,callback) {
-        callback();
+    async write(source,message) {
     }
 }
 
@@ -43,18 +42,18 @@ class TestTimer {
 }
 
 class NullValveController extends EventEmitter {
-    setOpen(open,source,callback) {
+    async setOpen(open,source) {
         this.emit('setOpen', {
             open,source
         });
-        callback(null,{
+        return {
             open,source
-        });
+        };
     }
 }
 
 describe('Test scheduler',function() {
-    it('Waters the garden as scheduled and that auto cutoff doesn\'t affect scheduled waterings',function(done) {
+    it('Waters the garden as scheduled and that auto cutoff doesn\'t affect scheduled waterings',async (done) => {
         const storage = {};
         storage[config.SCHEDULE_KEY] = {   
             items: [
@@ -95,38 +94,37 @@ describe('Test scheduler',function() {
                 done();
             }
         });
-        scheduler.start(true,() => {
-            // shouldn't start yet
-            scheduler.check(() => {
-                // should start now
-                testTimer._now = new Date(2016,1,25,10,0,1);
-                testStep = 1;
-                scheduler.check(() => {
-                    // should still be watering
-                    testTimer._now = new Date(2016,1,25,10,14,59);
-                    testStep = 2;
-                    scheduler.check(() => {
-                        // should stop now
-                        testTimer._now = new Date(2016,1,25,10,15,1);
-                        testStep = 3;
-                        scheduler.check(()=> {
-                            // shouldn't run until tomorrow
-                            testTimer._now = new Date(2016,1,26,10,0,1);
-                            testStep = 4;
-                            scheduler.check(() => {
-                                // should run again
-                                testTimer._now = new Date(2016,1,27,10,0,1);
-                                testStep = 5;
-                                scheduler.check();
-                            });
-                        });
-                    });
-                });
-            });
-        });
+        await scheduler.start(true);
+        // shouldn't start yet
+        await scheduler.check();
+
+        // should start now
+        testTimer._now = new Date(2016,1,25,10,0,1);
+        testStep = 1;
+        await scheduler.check();
+
+        // should still be watering
+        testTimer._now = new Date(2016,1,25,10,14,59);
+        testStep = 2;
+        await scheduler.check();
+
+        // should stop now
+        testTimer._now = new Date(2016,1,25,10,15,1);
+        testStep = 3;
+        await scheduler.check();
+
+        // shouldn't run until tomorrow
+        testTimer._now = new Date(2016,1,26,10,0,1);
+        testStep = 4;
+        await scheduler.check();
+
+        // should run again
+        testTimer._now = new Date(2016,1,27,10,0,1);
+        testStep = 5;
+        await scheduler.check();
     });
 
-    it('Stops watering after the cutoff time has elapsed',function(done) {
+    it('Stops watering after the cutoff time has elapsed',async (done)=> {
         const storage = {};
         storage[config.SCHEDULE_KEY] = {   
             items: [
@@ -141,19 +139,18 @@ describe('Test scheduler',function() {
         const testFetcher = sinon.stub().returns(Promise.resolve());
         const scheduler = new Scheduler('xxxx',nullStorage,new NullHistory(),new NullLogger(),valveController,testFetcher, testTimer);
 
-        scheduler.start(true,() => {
-            valveController.setOpen(true,config.WEB_USER,() => {
-                valveController.on('setOpen',({ open, source}) => {
-                    expect(open).to.be.false;
-                    done();
-                });
-                testTimer._now = new Date(2016,1,25,9,32,1);
-                scheduler.check();
-            });
+        await scheduler.start(true);
+        await valveController.setOpen(true,config.WEB_USER);
+
+        valveController.on('setOpen',({ open, source}) => {
+            expect(open).to.be.false;
+            done();
         });
+        testTimer._now = new Date(2016,1,25,9,32,1);
+        await scheduler.check();
     });
 
-    it('Doesn\'t water if its already raining',function(done) {
+    it('Doesn\'t water if its already raining',async (done) => {
         const storage = {};
         storage[config.SCHEDULE_KEY] = {   
             items: [
@@ -195,12 +192,11 @@ describe('Test scheduler',function() {
             expect(storage[config.SCHEDULE_KEY].items[0].nextRun).to.equal(new Date(2016,1,25,0,0,0).getTime() + (2 * 86400 * 1000) + (10 * 3600 * 1000));
             done();
         });
-        scheduler.start(true,()=>{
-            scheduler.check();
-        });
+        await scheduler.start(true);
+        await scheduler.check();
     });
 
-    it('Waters if its not raining',function(done) {
+    it('Waters if its not raining',async (done) => {
         const storage = {};
         storage[config.SCHEDULE_KEY] = {   
             items: [
@@ -242,8 +238,7 @@ describe('Test scheduler',function() {
             expect(storage[config.SCHEDULE_KEY].items[0].nextRun).to.equal(new Date(2016,1,25,0,0,0).getTime() + (2 * 86400 * 1000) + (10 * 3600 * 1000));
             done();
         });
-        scheduler.start(true,()=>{
-            scheduler.check();
-        });
+        await scheduler.start(true);
+        await scheduler.check();
     });
 });

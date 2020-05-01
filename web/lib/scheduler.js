@@ -23,59 +23,51 @@ export default class Scheduler {
         this.apiKey = apiKey;
     }
 
-    start(manualChecking,cb) {
-        this._load(() => {
-            this.valveController.on('setOpen', ({
-                open, source
-            }) => {
-                if (source !== config.SCHEDULER) {
-                    if (open && this.settings.shutoffDuration) {
-                        // ensure that if we manually opened the valve
-                        // that it shuts off after a specified amount
-                        // of time (if configured)
-                        this.waterUntil = this.timer.now().getTime() + (this.settings.shutoffDuration * 60 * 1000);
-                    } else {
-                        // manually setting the valve disables any
-                        // scheduled waterings
-                        this.waterUntil = 0;
-                    }
+    async start(manualChecking) {
+        await this._load();
+        this.valveController.on('setOpen', ({
+            open, source
+        }) => {
+            if (source !== config.SCHEDULER) {
+                if (open && this.settings.shutoffDuration) {
+                    // ensure that if we manually opened the valve
+                    // that it shuts off after a specified amount
+                    // of time (if configured)
+                    this.waterUntil = this.timer.now().getTime() + (this.settings.shutoffDuration * 60 * 1000);
+                } else {
+                    // manually setting the valve disables any
+                    // scheduled waterings
+                    this.waterUntil = 0;
                 }
-            });
-            if (!manualChecking) {
-                this.check();
-                this.checkHandle = setInterval(this.check.bind(this), config.SCHEDULE_CHECK_INTERVAL);
             }
-            cb();
         });
+        if (!manualChecking) {
+            await this.check();
+            this.checkHandle = setInterval(async () => await this.check(), config.SCHEDULE_CHECK_INTERVAL);
+        }
     }
 
     stop() {
         clearInterval(this.checkHandle);
     }
 
-    reload() {
-        this._load(() => {
-            this.logger.info('Scheduler reloaded');
-        });
+    async reload() {
+      await this._load();
+      this.logger.info('Scheduler reloaded');
     }
 
-    _load(cb) {
-        this.storage.getItem(config.SETTINGS_KEY).then(settings => {
-            this.settings = settings || {};
-            return this.storage.getItem(config.SCHEDULE_KEY);
-        })
-        .then(schedule => {
-          this.schedule = schedule ? schedule.items : [];
-          if (cb) {
-              cb();
-          }
-        })
-        .catch(err => {
-          this.logger.error(`Unable to load schedule ${err.stack}`);
-        });
+    async _load() {
+      try {
+        const settings = await this.storage.getItem(config.SETTINGS_KEY);
+        this.settings = settings || {};
+        const schedule = await this.storage.getItem(config.SCHEDULE_KEY);
+        this.schedule = schedule ? schedule.items : [];
+      } catch(err) {
+        this.logger.error(`Unable to load schedule ${err.stack}`);
+      }
     }
 
-    check(callback = function(){}) {
+    async check() {
         const now = this.timer.now();
         const currentHour = now.getHours();
         this.logger.verbose(`Checking schedule for hour ${currentHour}`);
@@ -98,65 +90,60 @@ export default class Scheduler {
         });
 
         if (updated) {
-            this.storage.setItem(config.SCHEDULE_KEY, {
+          try {
+            await this.storage.setItem(config.SCHEDULE_KEY, {
                 items: this.schedule
-            }).then(() => {
-                if (this.settings.location) {
-                    this._checkWeather(this.settings.location, (shouldWater, weatherDesc) => {
-                        if (!shouldWater) {
-                            this.history.write(config.SCHEDULER, `Watering cancelled due to weather conditions - ${weatherDesc}`, () => {
-                                this._setValve(false,callback);
-                                this.waterUntil = 0;
-                            });
-                        } else {
-                            this._setValve(true,callback);
-                        }
-                    });
-                } else {
-                    this._setValve(true,callback);
-                }
-            }).catch(err => {
-              this.logger.error(`Unable to update schedule ${err.stack}`);
-              callback();
             });
+          } catch(err) {
+            this.logger.error(`Unable to update schedule ${err.stack}`);
+          }
+          if (this.settings.location) {
+              const {shouldWater , weatherDesc} = await this._checkWeather(this.settings.location);
+              if (!shouldWater) {
+                  await this.history.write(config.SCHEDULER, `Watering cancelled due to weather conditions - ${weatherDesc}`);
+                  await this._setValve(false);
+                  this.waterUntil = 0;
+              } else {
+                  await this._setValve(true);
+              }
+          } else {
+              await this._setValve(true);
+          }
         } else if (this.waterUntil) {
-            this._setValve(this.waterUntil > now.getTime(),callback);
-        } else {
-            callback();
+            await this._setValve(this.waterUntil > now.getTime());
         }
     }
 
-    _setValve(open,callback) {
-        this.valveController.setOpen(open, config.SCHEDULER, err => {
-            if (err) {
-                this.logger.error(`Unable to set valve status ${err.stack}`);
-            }
-            callback(err);
-        });
+    async _setValve(open) {
+      try {
+        await this.valveController.setOpen(open, config.SCHEDULER);
+      } catch (err) {
+        this.logger.error(`Unable to set valve status ${err.stack}`);
+        throw err;
+      }
     }
 
     _startOfDay(now) {
         return (new Date(now.getFullYear(), now.getMonth(), now.getDate())).getTime();
     }
 
-    _checkWeather(location, cb) {
-        this.fetcher(`http://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=${this.apiKey}`)
-          .then(res => res.json())
-          .then(res => {
-              // find if the code is any of the recognized weather types with rain
-              // from http://openweathermap.org/weather-conditions
-              const code = res.weather[0].id;
-              if ((code >= 200 && code <= 202) ||
-                  (code >= 300 && code <= 321) ||
-                  (code >= 500 && code <= 531)) {
-                  cb(false, res.weather[0].description);
-              } else {
-                  cb(true, null);
-              }
-          })
-          .catch(err => {
-              this.logger.error(`Unable to check weather status for current location - ${err.stack}`);
-              cb(true, null);
-          });
+    async _checkWeather(location) {
+      try {
+        const res = await this.fetcher(`http://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=${this.apiKey}`);
+        const json = await res.json();
+        // find if the code is any of the recognized weather types with rain
+        // from http://openweathermap.org/weather-conditions
+        const code = json.weather[0].id;
+        if ((code >= 200 && code <= 202) ||
+            (code >= 300 && code <= 321) ||
+            (code >= 500 && code <= 531)) {
+            return {shouldWater: false, weatherDesc: json.weather[0].description };
+        } else {
+            return {shouldWater: true, weatherDesc: null };
+        }
+      } catch(err) {
+        this.logger.error(`Unable to check weather status for current location - ${err.stack}`);
+        return {shouldWater: true, weatherDesc: null };
+      }
     }
 }

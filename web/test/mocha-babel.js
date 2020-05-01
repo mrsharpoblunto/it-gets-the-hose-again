@@ -1,6 +1,5 @@
-require('babel/register')({
-    stage: 0,
-    optional: ['runtime']
+require('@babel/register')({
+  'presets': [['@babel/preset-env',{ targets: { node: 'current' } }]]
 });
 
 if (!global.tidyStackTraces) {
@@ -17,7 +16,7 @@ if (!global.tidyStackTraces) {
 }
 
 // Ensure a DOM is present for React component tests
-var jsdom = require('jsdom');
+const jsdom = require('jsdom');
 global.document = jsdom.jsdom('<!DOCTYPE html><html><body></body></html>');
 global.window = document.defaultView;
 global.window.location.href = 'http://localhost';
