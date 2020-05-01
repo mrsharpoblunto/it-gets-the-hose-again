@@ -96,22 +96,18 @@ export default class ValveController extends EventEmitter {
 
     async setOpen(open, source) {
         if (this.valveGpio) {
-          try {
-            await new Promise((resolve, reject) => {
-              this.valveGpio.write(open ? 1 : 0, err => {
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve();
-                }
-              });
+          await new Promise((resolve, reject) => {
+            this.valveGpio.write(open ? 1 : 0, err => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve();
+              }
             });
-            return await this._setOpen(open, source);
-          } catch (err) {
-            throw err;
-          }
+          });
+          return await this._setOpen(open, source);
         } else {
-            return await this._setOpen(open, source);
+          return await this._setOpen(open, source);
         }
     }
 

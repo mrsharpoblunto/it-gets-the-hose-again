@@ -111,14 +111,13 @@ export default function(app) {
 
     app.delete('/api/1/schedule/:id', async (req, res) => {
       try {
-        const value = app.storage.getItem(config.SCHEDULE_KEY);
-            value = value || {
-                items: []
-            };
+        const value = (await app.storage.getItem(config.SCHEDULE_KEY)) || {
+            items: []
+        };
 
-            value.items = value.items.filter(item => {
-                return item.id !== req.params.id
-            });
+        value.items = value.items.filter(item => {
+            return item.id !== req.params.id
+        });
         await app.storage.setItem(config.SCHEDULE_KEY, value);
         app.scheduler.reload();
         res.json({
@@ -169,8 +168,7 @@ export default function(app) {
         };
 
       try {
-        const value = await app.storage.getItem(config.SCHEDULE_KEY);
-        value = value || {
+        const value = (await app.storage.getItem(config.SCHEDULE_KEY)) || {
             items: [],
             waterUntil: 0
         };
@@ -221,10 +219,7 @@ export default function(app) {
         }
 
         try {
-          const settings = await app.storage.getItem(config.SETTINGS_KEY);
-          if (!settings) {
-              settings = getDefaultSettings();
-          }
+          const settings = (await app.storage.getItem(config.SETTINGS_KEY)) || getDefaultSettings();
 
           if (typeof(req.body.shutoffDuration) !== 'undefined') {
               if (typeof(req.body.shutoffDuration) !== 'number' || req.body.shutoffDuration < 0 || req.body.duration >= 60) {

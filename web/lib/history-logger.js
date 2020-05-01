@@ -8,12 +8,9 @@ export default class HistoryLogger {
     }
     async write(source, message) {
       try {
-        const value = await this.storage.getItem(config.HISTORY_KEY);
-        if (!value) {
-            value = {
-                items: []
-            };
-        }
+        const value = (await this.storage.getItem(config.HISTORY_KEY)) || {
+            items: []
+        };
 
         const newItem = {
             id: value.items.length === 0 ? 0 : value.items[0].id + 1,
