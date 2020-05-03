@@ -18,7 +18,7 @@ export default function SettingsComponent() {
   const history = useHistory();
   const [
     {
-      settings: {initialized, settings},
+      settings: {updating, initialized, settings},
     },
     dispatch,
   ] = useContext(StoreContext);
@@ -123,7 +123,24 @@ export default function SettingsComponent() {
     <Loading />
   ) : (
     <div className="row">
-      <h3>Settings</h3>
+      <h3>
+        Settings
+        {updating && (
+          <div className="preloader-wrapper small active">
+            <div className="spinner-layer spinner-green-only">
+              <div className="circle-clipper left">
+                <div className="circle"></div>
+              </div>
+              <div className="gap-patch">
+                <div className="circle"></div>
+              </div>
+              <div className="circle-clipper right">
+                <div className="circle"></div>
+              </div>
+            </div>
+          </div>
+        )}
+      </h3>
       <form className="col s12">
         <div className="row">
           <div className="col s12">
