@@ -3,7 +3,6 @@
  */
 import React from 'react';
 import {useEffect, useContext} from 'react';
-import tapOrClick from 'react-tap-or-click';
 import {StoreContext} from '../store-provider';
 import {useHistory} from 'react-router-dom';
 import {pollValve, toggleValve} from '../actions/valve';
@@ -28,12 +27,7 @@ export default function ValveSwitch() {
     <div className="right switch">
       <label>
         Closed
-        <input
-          type="checkbox"
-          onChange={handleChange}
-          {...tapOrClick(handleChange)}
-          checked={open}
-        />
+        <input type="checkbox" onChange={handleChange} checked={open} />
         <span className="lever"></span>
         Open
       </label>
