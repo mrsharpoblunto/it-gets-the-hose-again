@@ -1,7 +1,7 @@
 import actions from './action-types';
 import { apiError } from './api';
 
-export function updateHistory() {
+export function updateHistory(history) {
     return (dispatch, getState) => {
         dispatch({
             type: actions.GET_HISTORY_START
@@ -15,7 +15,7 @@ export function updateHistory() {
               dispatch(res);
           })
           .catch(err => {
-              dispatch(apiError(err));
+              dispatch(apiError(err,history));
           });
     };
 }

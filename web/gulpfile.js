@@ -3,20 +3,15 @@ require('babel/register')({
 });
 
 var gulp = require('gulp'),
-    uglify = require('gulp-uglify'),
     imagemin = require('gulp-imagemin'),
-    concat = require('gulp-concat'),
     mocha = require('gulp-mocha'),
     newer = require('gulp-newer'),
     gutil = require('gulp-util'),
     webpack = require('webpack'),
     del = require('del'),
     fs = require('fs'),
-    os = require('os'),
-    path = require('path'),
     webpackDevServer = require('webpack-dev-server'),
     eslint = require('gulp-eslint'),
-    exec = require('child_process').exec,
     Restartable = require('restartable-process');
 
 // build configuration
@@ -40,16 +35,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 args.push('index.js');
 var node = new Restartable('node', args);
-
-gulp.task('jquery-scripts', function() {
-    return gulp.src([
-            'node_modules/jquery/dist/jquery.min.js',
-            'node_modules/materialize-css/dist/js/materialize.min.js'
-        ])
-        .pipe(newer('public/vendor-jquery.js'))
-        .pipe(concat('vendor-jquery.js'))
-        .pipe(gulp.dest('public'));
-});
 
 gulp.task('webpack', function(callback) {
     webpack(webpackConfig, function(err, stats) {
@@ -129,7 +114,7 @@ gulp.task('clean', function(cb) {
     });
 });
 
-gulp.task('build-common', ['jquery-scripts', 'images', 'html', 'lint']);
+gulp.task('build-common', ['images', 'html', 'lint']);
 
 // external tasks
 gulp.task('build', ['build-common', 'webpack']);

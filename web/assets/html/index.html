@@ -31,15 +31,15 @@
 </head>
 <body>
     <div id="app-container"></div>
-    <script src="/vendor-jquery.js"></script>
     <script src="/vendor.js?rev=2"></script>
     <script src="/app.js?rev=2"></script>
     <script>
-        $(document).ready(function() {
-           if (window.navigator.standalone) {
-               $("#app-container").addClass("status-bar");
-           }
-        });
+      document.addEventListener('DOMContentLoaded', function() {
+         if (window.navigator.standalone) {
+           const elems = document.querySelectorAll('#app-container');
+           elems[0].classList.add('status-bar');
+         }
+      });
     </script>
 </body>
 </html>

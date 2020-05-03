@@ -1,27 +1,42 @@
+/*
+ * @format
+ */
 import React from 'react';
+import {useEffect, useContext} from 'react';
 import tapOrClick from 'react-tap-or-click';
-import { connect } from 'react-redux';
-import { pollValve,toggleValve } from '../actions/valve';
+import {StoreContext} from '../store-provider';
+import {useHistory} from 'react-router-dom';
+import {pollValve, toggleValve} from '../actions/valve';
 
-@connect(state => state.valve)
-export default class ValveSwitch extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-    componentDidMount() {
-        this.props.dispatch(pollValve());
-    }
-    handleChange = () => {
-        this.props.dispatch(toggleValve());
-    }
-    render() {
-        return (<div className='right switch'>
-            <label>
-                Closed
-                <input type='checkbox' {...tapOrClick(this.handleChange)} checked={this.props.open}/>
-                <span className='lever'></span>
-                Open
-            </label>
-        </div>);
-    }
+export default function ValveSwitch() {
+  const history = useHistory();
+  const [
+    {
+      valve: {open},
+    },
+    dispatch,
+  ] = useContext(StoreContext);
+
+  useEffect(() => {
+    dispatch(pollValve(history));
+  }, [dispatch, history]);
+
+  const handleChange = () => {
+    dispatch(toggleValve(history));
+  };
+  return (
+    <div className="right switch">
+      <label>
+        Closed
+        <input
+          type="checkbox"
+          onChange={handleChange}
+          {...tapOrClick(handleChange)}
+          checked={open}
+        />
+        <span className="lever"></span>
+        Open
+      </label>
+    </div>
+  );
 }

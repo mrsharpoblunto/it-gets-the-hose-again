@@ -6,7 +6,7 @@ module.exports = {
     debug: false,
     entry: {
         app: [__dirname + '/assets/css/app.scss', __dirname + '/assets/js/app.js'],
-        vendor: ['react', 'react-dom', 'redux', 'react-redux', 'redux-logger', 'redux-thunk', 'moment']
+        vendor: ['react', 'react-dom', 'react-router-dom', 'moment']
     },
     output: {
         path: path.join(__dirname, 'public'),
@@ -45,9 +45,5 @@ module.exports = {
             loader: 'file?name=/css/images/[name].[ext]?v=[hash]'
         }],
         noParse: [/moment/]
-    },
-    externals: {
-        '$': 'window.$',
-        'jQuery': 'window.jQuery'
     }
 };

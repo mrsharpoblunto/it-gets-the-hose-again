@@ -1,8 +1,7 @@
-import { pushPath } from 'redux-simple-router';
 import actions from './action-types';
 import { pollValve } from './valve';
 
-export function login(name, password) {
+export function login(name, password, history) {
     return dispatch => {
         dispatch({
             type: actions.LOGIN_START
@@ -21,7 +20,7 @@ export function login(name, password) {
             dispatch(res);
             if (res.success) {
                 dispatch(pollValve());
-                dispatch(pushPath('/'));
+                history.replace('/');
             }
         })
         .catch(() => {

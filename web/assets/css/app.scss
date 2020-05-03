@@ -1,4 +1,4 @@
-@import "node_modules/materialize-css/sass/components/color";
+@import "node_modules/materialize-css/sass/components/_color-variables.scss";
 
 $primary-color: color("light-blue","base") !default;
 $primary-color-light: false !default;
@@ -12,7 +12,7 @@ $primary-color-dark: false !default;
 $secondary-color: color("green","accent-3");
 $bg-color: color("grey","darken-3");
 $bg-text-color: #ffffff;
-
+$input-background: #ffffff;
 $roboto-font-path: "../../node_modules/materialize-css/fonts/roboto/";
 $icons-font-path: "../../node_modules/materialize-css/fonts/material-design-icons/";
 @import "node_modules/materialize-css/sass/materialize.scss";
@@ -45,6 +45,7 @@ nav .switch label {
 }
 
 .weather-info {
+    z-index: 1;
     position: absolute;
     background-color: #fff;
     color: $off-black;
@@ -52,9 +53,13 @@ nav .switch label {
     padding: 0 8px;
     border: 1px solid #9e9e9e;
     text-transform: capitalize;
+    height: 50px;
 }
+
 .weather-info img {
     margin-right: 8px;
+    height: 50px;
+    width: 50px;
 }
 
 .weather-btn, .delete-btn {
@@ -63,4 +68,17 @@ nav .switch label {
 
 .weather-btn {
     margin-top: -6px;
+}
+
+.weather-info h5 {
+    line-height: 50px;
+    margin: 0;
+}
+
+.weather-row {
+  margin: 0;
+}
+
+#homekit-pin {
+  color: #fff;
 }

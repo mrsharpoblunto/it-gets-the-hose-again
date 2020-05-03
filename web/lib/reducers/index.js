@@ -1,16 +1,33 @@
-import { combineReducers } from 'redux';
-import { routeReducer } from 'redux-simple-router';
+/*
+ * @format
+ */
 import authReducer from './auth-reducer';
-import valveReducer from './valve-reducer'
+import valveReducer from './valve-reducer';
 import scheduleReducer from './schedule-reducer';
 import historyReducer from './history-reducer';
 import settingsReducer from './settings-reducer';
 
-export default combineReducers({
-    auth: authReducer,
-    routing: routeReducer,
-    valve: valveReducer,
-    schedule: scheduleReducer,
-    history: historyReducer,
-    settings: settingsReducer
-})
+function combineReducers(reducers) {
+  const combinedReducer = (state, action) => {
+    const newState = {};
+    Object.entries(reducers).forEach(([key, value]) => {
+      newState[key] = value(state[key], action);
+    });
+    return newState;
+  };
+
+  return {
+    Reducer: combinedReducer,
+    InitialState: combinedReducer({}, {type: '@@INIT'}),
+  };
+}
+
+const reducer = combineReducers({
+  auth: authReducer,
+  valve: valveReducer,
+  schedule: scheduleReducer,
+  history: historyReducer,
+  settings: settingsReducer,
+});
+
+export default reducer;

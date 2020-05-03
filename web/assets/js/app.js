@@ -1,19 +1,21 @@
+/*
+ * @format
+ */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router } from 'react-router';
-import { Provider } from 'react-redux';
-import { createHistory } from 'history';
-import { syncReduxAndRouter } from 'redux-simple-router';
+import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
+import {StoreProvider} from '../../lib/store-provider';
+import Main from '../../lib/components/main';
+import Login from '../../lib/components/login';
 
-import createStoreWithMiddleware from '../../lib/store';
-import routes from '../../lib/routes';
-
-const store = createStoreWithMiddleware();
-const history = createHistory();
-syncReduxAndRouter(history,store);
-
-ReactDOM.render(<Provider store={store}>
-    <Router history={history}>
-        { routes }
+ReactDOM.render(
+  <StoreProvider>
+    <Router>
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route path="/" component={Main} />
+      </Switch>
     </Router>
-</Provider>,document.getElementById('app-container'));
+  </StoreProvider>,
+  document.getElementById('app-container'),
+);

@@ -1,9 +1,5 @@
-import { pushPath } from 'redux-simple-router';
-
-export function apiError(err) {
-    return dispatch => {
-        if (err.status === 401) {
-            dispatch(pushPath('/login'));
-        }
-    };
+export function apiError(err, history) {
+  if (err.status === 401) {
+    history.replace('/login');
+  }
 }

@@ -1,7 +1,7 @@
 import actions from './action-types';
 import { apiError } from './api';
 
-export function getSchedule() {
+export function getSchedule(history) {
     return dispatch => {
         dispatch({
             type: actions.GET_SCHEDULE_START
@@ -17,12 +17,12 @@ export function getSchedule() {
                     type: actions.GET_SCHEDULE_FINISH,
                     success: false
                 });
-                dispatch(apiError(err));
+                dispatch(apiError(err, history));
             });
     };
 }
 
-export function removeFromSchedule(id) {
+export function removeFromSchedule(id, history) {
     return dispatch => {
         dispatch({
             type: actions.REMOVE_FROM_SCHEDULE_START,
@@ -43,12 +43,12 @@ export function removeFromSchedule(id) {
                     id,
                     success: false
                 });
-                dispatch(apiError(err));
+                dispatch(apiError(err, history));
             });
     };
 }
 
-export function addToSchedule(duration, time, frequency) {
+export function addToSchedule(duration, time, frequency, history) {
     return dispatch => {
         dispatch({
             type: actions.ADD_TO_SCHEDULE_START
@@ -72,7 +72,7 @@ export function addToSchedule(duration, time, frequency) {
                   type: actions.ADD_TO_SCHEDULE_FINISH,
                   success: false
               });
-              dispatch(apiError(err));
+              dispatch(apiError(err, history));
           });
     };
 }

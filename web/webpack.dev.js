@@ -5,8 +5,8 @@ module.exports = {
     devtool: 'source-map',
     debug: true,
     entry: {
-        app: [__dirname + '/assets/css/app.scss', 'webpack-dev-server/client?', 'webpack/hot/dev-server', __dirname + '/assets/js/app.js'],
-        vendor: ['react', 'redux', 'react-redux', 'redux-logger', 'redux-thunk', 'react-dom', 'moment']
+        app: [__dirname + '/assets/css/app.scss', 'webpack-dev-server/client?', __dirname + '/assets/js/app.js'],
+        vendor: ['react', 'react-router-dom', 'react-dom', 'moment']
     },
     output: {
         path: path.join(__dirname, 'public'),
@@ -30,7 +30,7 @@ module.exports = {
     module: {
         loaders: [{
             test: /\.jsx?$/,
-            loaders: ['react-hot', __dirname + '/babel-loader?stage=0&optional=runtime&loose=es6.modules'],
+            loaders: [__dirname + '/babel-loader?stage=0&optional=runtime&loose=es6.modules'],
             exclude: /node_modules/
         }, {
             test: /\.scss$/,
@@ -43,9 +43,5 @@ module.exports = {
             loader: 'file?name=/css/images/[name].[ext]?v=[hash]'
         }],
         noParse: [/moment/]
-    },
-    externals: {
-        '$': 'window.$',
-        'jQuery': 'window.jQuery'
     }
 };
