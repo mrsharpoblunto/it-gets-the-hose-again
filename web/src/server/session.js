@@ -1,3 +1,6 @@
+/**
+ * @format
+ */
 import uuid from 'node-uuid';
 import * as config from './config';
 

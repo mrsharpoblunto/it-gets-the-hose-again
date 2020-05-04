@@ -1,3 +1,6 @@
+/**
+ * @format
+ */
 import actions from './action-types';
 import { apiError } from './api';
 

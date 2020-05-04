@@ -1,3 +1,6 @@
+/**
+ * @format
+ */
 import * as config from './config';
 
 export default class HistoryLogger {

@@ -1,3 +1,6 @@
+/**
+ * @format
+ */
 import * as hap from 'hap-nodejs';
 import * as config from './config';
 

@@ -1,3 +1,6 @@
+/**
+ * @format
+ */
 import fetch from 'node-fetch';
 import * as config from './config';
 

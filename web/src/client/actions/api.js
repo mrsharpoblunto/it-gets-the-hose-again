@@ -1,3 +1,6 @@
+/**
+ * @format
+ */
 import actionTypes from './action-types';
 
 export function apiError(err, history) {

@@ -1,3 +1,6 @@
+/**
+ * @format
+ */
 import actions from './action-types';
 import { pollValve } from './valve';
 
@@ -19,7 +22,7 @@ export function login(name, password, history) {
             res.type = actions.LOGIN_FINISH;
             dispatch(res);
             if (res.success) {
-                dispatch(pollValve());
+                dispatch(pollValve(history));
                 history.replace('/');
             }
         })
