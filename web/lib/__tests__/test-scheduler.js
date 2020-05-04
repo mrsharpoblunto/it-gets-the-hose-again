@@ -26,7 +26,7 @@ class NullStorage {
 }
 
 class NullHistory {
-  async write(source, message) {}
+  async write() {}
 }
 
 class TestTimer {
@@ -82,7 +82,7 @@ describe('Test scheduler', function () {
     );
 
     let testStep = 0;
-    valveController.on('setOpen', ({open, source}) => {
+    valveController.on('setOpen', ({open}) => {
       if (testStep === 0) {
         expect(open).toBe(true);
       }
@@ -164,7 +164,7 @@ describe('Test scheduler', function () {
     await scheduler.start(true);
     await valveController.setOpen(true, config.WEB_USER);
 
-    valveController.on('setOpen', ({open, source}) => {
+    valveController.on('setOpen', ({open}) => {
       expect(open).toBe(false);
       done();
     });

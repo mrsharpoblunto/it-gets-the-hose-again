@@ -25,7 +25,11 @@
     },
     "globals": {
         "AbortController": "readonly",
-        "Promise": "readonly"
+        "Promise": "readonly",
+        "jest": "readonly",
+        "describe": "readonly",
+        "it": "readonly",
+        "expect": "readonly",
     },
     "settings": {
       "react": {
