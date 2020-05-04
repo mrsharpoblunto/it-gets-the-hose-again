@@ -2,12 +2,13 @@
  * @format
  */
 import React from 'react';
-import {useState, useContext} from 'react';
+import {useState, useContext, useEffect} from 'react';
 import tapOrClick from 'react-tap-or-click';
 import {useHistory} from 'react-router-dom';
 import {login} from '../actions/auth';
 import Logo from './logo';
 import {StoreContext} from '../store-provider';
+import M from 'materialize-css';
 
 export default function LoginComponent() {
   const [name, setName] = useState('');
@@ -21,19 +22,15 @@ export default function LoginComponent() {
   ] = useContext(StoreContext);
 
   useEffect(() => {
-    /* eslint no-undef:0 */
-    Materialize.updateTextFields();
-  });
+    M.updateTextFields();
+  }, []);
 
-  handleLogin = useCallback(
-    e => {
-      e.preventDefault();
-      if (name && password) {
-        dispatch(login(name, password, history));
-      }
-    },
-    [name, password, dispatch, history],
-  );
+  const handleLogin = e => {
+    e.preventDefault();
+    if (name && password) {
+      dispatch(login(name, password, history));
+    }
+  };
 
   return (
     <div className="valign-wrapper" style={{width: '100%', height: '100%'}}>
@@ -75,7 +72,7 @@ export default function LoginComponent() {
                 <button
                   className={
                     'btn waves-effect waves-light ' +
-                    (state.loading ? 'disabled' : '')
+                    (loading ? 'disabled' : '')
                   }
                   type="submit"
                   name="action"
