@@ -33,7 +33,11 @@ export function toggleValve(history) {
 
 let polling = false;
 
-export function pollValve(internal, history) {
+export function pollValve(history) {
+  return pollValveInternal(false, history);
+}
+
+function pollValveInternal(internal, history) {
   return (dispatch, getState) => {
     if (!internal && polling) return;
     polling = true;
@@ -46,7 +50,7 @@ export function pollValve(internal, history) {
     );
     const pollNext = () =>
       setTimeout(
-        () => dispatch(pollValve(true, history)),
+        () => dispatch(pollValveInternal(true, history)),
         new Date().getTime() - startTime < 1000 ? 1000 : 0,
       );
 

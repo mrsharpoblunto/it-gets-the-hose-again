@@ -24,6 +24,7 @@ node_modules
 .DS_Store
 
 web/keys.js
-web/public
+web/dist
 web/ssl
 web/persist
+web/.parcel-cache
