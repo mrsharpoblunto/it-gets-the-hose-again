@@ -9,4 +9,4 @@ do
     fi
 done
 
-npm install --production
+yarn install --production

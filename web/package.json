@@ -1,22 +1,19 @@
 {
   "name": "it-gets-the-hose-again",
   "version": "0.0.1",
-  "readme": "README.rm",
+  "readme": "README.md",
   "license": "MIT",
   "repository": "https://github.com/mrsharpoblunto/it-gets-the-hose-again.git",
   "scripts": {
-    "build": "rimraf dist/ && parcel build assets/html/index.html --no-scope-hoist --no-source-maps",
+    "build": "rimraf dist/ && rimraf lib/ && babel src/server -d lib/server && parcel build assets/html/index.html --no-scope-hoist --no-source-maps",
     "server": "node index.js",
-    "dev:server": "node scripts/dev-server.js",
+    "dev:server": "nodemon --watch src/server --inspect index.js",
     "dev:client": "parcel serve assets/html/index.html --port 3001",
     "dev": "concurrently \"yarn dev:server\" \"yarn dev:client\"",
-    "test": "jest",
-    "lint": "eslint lib/"
+    "test": "jest src/.*/__tests__/.*\\.js",
+    "lint": "eslint src/"
   },
   "dependencies": {
-    "@babel/core": "^7.9.6",
-    "@babel/preset-env": "^7.9.6",
-    "@babel/register": "^7.9.0",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.5",
@@ -31,6 +28,11 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/preset-react": "^7.9.4",
+    "@babel/register": "^7.9.0",
     "@parcel/resolver-default": "^2.0.0-alpha.3",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^25.5.1",
@@ -39,18 +41,16 @@
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^4.0.0",
     "google-maps-react": "^2.0.6",
-    "http-proxy-middleware": "^1.0.3",
     "jest": "^25.5.4",
     "materialize-css": "^1.0.0",
     "moment": "^2.10.3",
+    "nodemon": "^2.0.3",
     "parcel": "^2.0.0-alpha.3.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.1.2",
     "react-tap-or-click": "^0.2.1",
-    "restartable-process": "^1.0.1",
     "rimraf": "^3.0.2",
-    "sass": "^1.26.5",
-    "tcp-port-used": "^1.0.1"
+    "sass": "^1.26.5"
   }
 }

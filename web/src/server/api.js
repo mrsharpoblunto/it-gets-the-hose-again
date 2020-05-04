@@ -3,9 +3,8 @@
  */
 import uuid from 'node-uuid';
 import fetch from 'node-fetch';
-import * as keys from '../keys';
+import keys from '../../keys.json';
 import * as config from './config';
-import * as clientConfig from './client-config';
 import {middleware} from './session';
 
 export default function (app) {
@@ -40,16 +39,19 @@ export default function (app) {
         'Content-Type': 'application/json',
       });
       res.write(''); // flush headers to the client
-      waitForValveEvent(clientConfig.LONGPOLL_TIMEOUT, (timedOut, open) => {
-        res.write(
-          JSON.stringify({
-            success: true,
-            change: timedOut ? false : open !== query,
-            open,
-          }),
-        );
-        res.end();
-      });
+      waitForValveEvent(
+        req.query.timeout < 60000 ? req.query.timeout : 60000,
+        (timedOut, open) => {
+          res.write(
+            JSON.stringify({
+              success: true,
+              change: timedOut ? false : open !== query,
+              open,
+            }),
+          );
+          res.end();
+        },
+      );
     }
   });
 

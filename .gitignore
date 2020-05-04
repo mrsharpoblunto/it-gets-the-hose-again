@@ -23,8 +23,9 @@ node_modules
 *.swp
 .DS_Store
 
-web/keys.js
+web/keys.json
 web/dist
+web/lib
 web/ssl
 web/persist
 web/.parcel-cache

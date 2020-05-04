@@ -6,9 +6,9 @@ While it is possible to build the application on the Pi itself, it is *much* fas
 
 ##### On your Dev machine
 * Install Node.js for your platform (OSX or Linux is recommended)
-* Run ```npm install -g gulp```
-* Run ```npm install```
-* Run ```cp keys.default.js keys.js```
+* Run ```npm install -g yarn```
+* Run ```yarn```
+* Run ```cp keys.default.json keys.json```
 * Edit keys.js in your favourite text editor and add your Google Maps & OpenWeatherMap API keys. These keys are required and the web app will not work correctly without them
 
  ###### Getting a OpenWeatherMap API key
@@ -24,6 +24,7 @@ While it is possible to build the application on the Pi itself, it is *much* fas
 * Run ```./install_on_pi.sh``` (This will most likely take a long time)
 
 ##### Then back on your Dev machine
+* run ```yarn build```. To build the application locally
 * run ```deploy_to_pi.sh user@raspberry-pi-ip:/path/to/web/app/folder/you/were/in/on/the/previous/step```. This will rsync the built application to the pi (it will also ask you for the pi users password a couple of times if you have not set up passwordless SSH).
 
 ##### Then on the Pi
@@ -42,20 +43,19 @@ Development on the Raspberry Pi hardware can be somewhat painful, so this applic
 If you ran the install steps above, you should now have a working development environment set up. To build and run the application run 
 
 ```
-gulp build
-gulp serverw
+yarn dev
 ```
 
-The build command only needs to be run once - this builds some frontend vendor dependancies and does not need to be re-run. The serverw command starts up the application server and watches for changes and restarts/hot-reloads as changes are detected. You should now be able to browse to the web UI on http://localhost:3001/.
+This command starts up the application server and watches for changes and restarts/hot-reloads as changes are detected. You should now be able to browse to the web UI on http://localhost:3001/.
 
 To run the tests, run
 
 ```
-gulp tests
+yarn test
 ```
 
 And to have the tests watch for file changes, run
 
 ```
-gulp testsw
+yarn test --watch
 ```

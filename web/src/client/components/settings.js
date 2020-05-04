@@ -5,11 +5,10 @@ import React from 'react';
 import {useState, useEffect, useContext} from 'react';
 import tapOrClick from 'react-tap-or-click';
 
-import * as keys from '../../keys';
+import keys from '../../../keys.json';
 import {getSettings, updateSettings} from '../actions/settings';
 import {useHistory} from 'react-router-dom';
 import Loading from './loading';
-import * as clientConfig from '../client-config';
 import {StoreContext} from '../store-provider';
 import M from 'materialize-css';
 import {Map, Marker, GoogleApiWrapper} from 'google-maps-react';
@@ -154,7 +153,7 @@ export default function SettingsComponent() {
           <div className="input-field col s12">
             <label htmlFor="homekit-pin">HomeKit Pin</label>
             <input
-              value={clientConfig.HOMEKIT_PINCODE}
+              value={keys.HOMEKIT_PINCODE}
               readOnly={true}
               id="homekit-pin"
               type="text"

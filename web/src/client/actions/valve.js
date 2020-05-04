@@ -54,9 +54,14 @@ function pollValveInternal(internal, history) {
         new Date().getTime() - startTime < 1000 ? 1000 : 0,
       );
 
-    return fetch(`/api/1/poll-valve?open=${getState().valve.open}`, {
-      signal: controller.signal,
-    })
+    return fetch(
+      `/api/1/poll-valve?open=${getState().valve.open}&timeout=${
+        clientConfig.LONGPOLL_TIMEOUT
+      }`,
+      {
+        signal: controller.signal,
+      },
+    )
       .then(res => res.json())
       .then(res => {
         if (res.success && res.change) {

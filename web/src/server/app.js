@@ -25,8 +25,7 @@ import ValveController from './valve-controller';
 import Scheduler from './scheduler';
 import HistoryLogger from './history-logger';
 import * as config from './config';
-import * as clientConfig from './client-config';
-import * as keys from '../keys';
+import keys from '../../keys.json';
 
 // configure express and its middleware
 const app = express();
@@ -112,7 +111,7 @@ app.storage = storage;
 function configureRoutes(app) {
   app.use(
     express.static(
-      path.join(__dirname, '..', 'dist'),
+      path.join(__dirname, '../../dist'),
       config.PUBLIC_STATIC_CACHING,
     ),
   );
@@ -163,7 +162,7 @@ function startHomekitServer(app) {
   accessory.publish({
     port: config.HOMEKIT_PORT,
     username: config.HOMEKIT_USERNAME,
-    pincode: clientConfig.HOMEKIT_PINCODE,
+    pincode: keys.HOMEKIT_PINCODE,
   });
   app.logger.info('Published HomeKit Accessory Info');
 }
@@ -198,8 +197,8 @@ function startServer(app) {
 
 function sslConfig() {
   return {
-    cert: tryReadFileSync(path.join(__dirname, '..', 'ssl', 'server.crt')),
-    key: tryReadFileSync(path.join(__dirname, '..', 'ssl', 'server.key')),
+    cert: tryReadFileSync(path.join(__dirname, '../../ssl', 'server.crt')),
+    key: tryReadFileSync(path.join(__dirname, '../../ssl', 'server.key')),
   };
 }
 
