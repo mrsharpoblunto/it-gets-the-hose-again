@@ -1,6 +1,4 @@
-require('@babel/register')({
-  'presets': [['@babel/preset-env',{ targets: { node: 'current' } }]]
-});
+require('@babel/register');
 
 // tidy up babels default stacktrace rendering
 process.on("uncaughtException", function(err) {
