@@ -3,7 +3,7 @@
  */
 import actions from './action-types';
 import {updateHistory} from './history';
-import {apiError} from './api';
+import {handleApiError} from './api';
 import * as clientConfig from '../client-config';
 
 export function toggleValve(history) {
@@ -16,17 +16,16 @@ export function toggleValve(history) {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({}),
     })
-      .then(res => res.json())
+      .then(res => handleApiError(res, history))
       .then(res => {
         res.type = actions.TOGGLE_VALVE_FINISH;
         dispatch(res);
       })
-      .catch(err => {
+      .catch(() => {
         dispatch({
           type: actions.TOGGLE_VALVE_FINISH,
           success: false,
         });
-        dispatch(apiError(err, history));
       });
   };
 }
@@ -62,7 +61,7 @@ function pollValveInternal(internal, history) {
         signal: controller.signal,
       },
     )
-      .then(res => res.json())
+      .then(res => handleApiError(res, history))
       .then(res => {
         if (res.success && res.change) {
           dispatch({
@@ -78,7 +77,6 @@ function pollValveInternal(internal, history) {
           pollNext();
         } else {
           polling = false;
-          dispatch(apiError(err, history));
         }
       })
       .finally(() => {

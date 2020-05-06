@@ -2,7 +2,7 @@
  * @format
  */
 import actions from './action-types';
-import {apiError} from './api';
+import {handleApiError} from './api';
 
 export function getSettings(history) {
   return dispatch => {
@@ -11,17 +11,16 @@ export function getSettings(history) {
     });
 
     fetch('/api/1/settings')
-      .then(res => res.json())
+      .then(res => handleApiError(res, history))
       .then(res => {
         res.type = actions.GET_SETTINGS_FINISH;
         dispatch(res);
       })
-      .catch(err => {
+      .catch(() => {
         dispatch({
           type: actions.GET_SETTINGS_FINISH,
           success: false,
         });
-        dispatch(apiError(err, history));
       });
   };
 }
@@ -37,17 +36,16 @@ export function updateSettings(settings, history) {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(settings),
     })
-      .then(res => res.json())
+      .then(res => handleApiError(res, history))
       .then(res => {
         res.type = actions.UPDATE_SETTINGS_FINISH;
         dispatch(res);
       })
-      .catch(err => {
+      .catch(() => {
         dispatch({
           type: actions.UPDATE_SETTINGS_FINISH,
           success: false,
         });
-        dispatch(apiError(err, history));
       });
   };
 }

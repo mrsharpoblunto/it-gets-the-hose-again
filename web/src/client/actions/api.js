@@ -1,14 +1,13 @@
 /**
  * @format
  */
-import actionTypes from './action-types';
-
-export function apiError(err, history) {
-  if (err.status === 401) {
-    history.replace('/login');
+export function handleApiError(res, history) {
+  if (!res.ok) {
+    if (res.status === 401) {
+      history.replace('/login');
+    }
+    return Promise.reject(`Received response code ${res.status}`);
+  } else {
+    return res.json();
   }
-  return {
-    type: actionTypes.API_ERROR,
-    details: err,
-  };
 }
