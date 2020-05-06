@@ -1,4 +1,4 @@
-The controller software is built on [Node.js](https://nodejs.org) on the backend and Uses [React.js](https://facebook.github.io/react/) & [Redux](https://github.com/rackt/redux) for the frontend web UI. The software is also compatible with Apples HomeKit using [HAP-NodeJS](https://github.com/KhaosT/HAP-NodeJS) if you want to use an IOS based controller app rather than the built in scheduling functionality exposed by the web UI.
+The controller software is built on [Node.js](https://nodejs.org) on the backend and Uses [React.js](https://facebook.github.io/react/) for the frontend web UI. The software is also compatible with Apples HomeKit using [HAP-NodeJS](https://github.com/KhaosT/HAP-NodeJS) if you want to use an IOS based controller app rather than the built in scheduling functionality exposed by the web UI.
 
 Building & Installation
 =======================
