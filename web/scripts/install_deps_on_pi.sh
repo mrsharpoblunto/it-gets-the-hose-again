@@ -5,11 +5,11 @@ if [ "$(whoami)" != "root" ]; then
 fi
 
 # install dependencies
-apt-get install pwauth openssl libavahi-compat-libdnssd-dev nodejs
+apt-get install pwauth openssl libavahi-compat-libdnssd-dev nodejs npm
 npm install -g yarn
 
 # set the app-server to auto start on boot
-cp systemd.conf /etc/systemd/system/itgetsthehose.service
+cp scripts/systemd.conf /etc/systemd/system/itgetsthehose.service
 cwd=$(pwd)
 sed -i.bak 's|CWD|'"$cwd"'|g' /etc/systemd/system/itgetsthehose.service
 rm /etc/systemd/system/itgetsthehose.service.bak
