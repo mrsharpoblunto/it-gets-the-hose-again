@@ -14,6 +14,28 @@
     <link href="https://raw.githubusercontent.com/mrsharpoblunto/it-gets-the-hose-again/master/web/assets/img/apple-icon-152.png" sizes="152x152" rel="apple-touch-icon-precomposed" />
     <link href="https://raw.githubusercontent.com/mrsharpoblunto/it-gets-the-hose-again/master/web/assets/img/apple-icon-167.png" sizes="167x167" rel="apple-touch-icon-precomposed" />
     <link href="https://raw.githubusercontent.com/mrsharpoblunto/it-gets-the-hose-again/master/web/assets/img/apple-icon-180.png" sizes="180x180" rel="apple-touch-icon-precomposed" />
+  <script type="text/javascript">
+  document.write(`<style>
+  @supports(padding: max(0px)) {
+    #app-container {
+      padding-left: max(0px, env(safe-area-inset-left));
+      padding-right: max(0px, env(safe-area-inset-right));
+      padding-top: max(0px, env(safe-area-inset-top));
+      padding-bottom: max(0px, env(safe-area-inset-bottom));
+    }
+    .add-btn {
+      margin-right: max(0px, env(safe-area-inset-right));
+      margin-bottom: max(0px, env(safe-area-inset-bottom));
+    }
+    .sidenav {
+      padding-top: max(0px, env(safe-area-inset-top)) !important;
+    }
+    .sidenav li {
+      padding-left: max(0px, env(safe-area-inset-left));
+    }
+  }
+</style>`);
+  </script>
 </head>
 <body>
     <div id="app-container"></div>
