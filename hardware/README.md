@@ -3,7 +3,7 @@ Controller hardware
 
 Water valve controller
 ----------------------
-This circuit allows the Pi to control a 24vAC solenoid water valve. Because the Pi can only drive up to 5vDC (or 3.3v from its GPIO ports) A relay is used to switch the 24v power supply to the valve on and off. By default it is assumed that the valve switch will be controlled by GPIO port 22 (though this can be configured by editing the lib/config.js file in the controller software)
+This circuit allows the Pi to control a 24vAC solenoid water valve. Because the Pi can only drive up to 5vDC (or 3.3v from its GPIO ports) A relay is used to switch the 24v power supply to the valve on and off. By default it is assumed that the valve switch will be controlled by GPIO port 22 (though this can be configured by editing the src/server/config.js file in the controller software)
 
 ![Controller circuit](controller.png?raw=true)
 
