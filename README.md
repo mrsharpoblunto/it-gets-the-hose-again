@@ -20,6 +20,7 @@ Powered by an AC connection into the enclosure & separate 5v and 24v DC adapters
 Version 2
 ---------
 Powered by a PoE+ (power-over-ethernet 802.3at) connection (driven by an injector [like this](https://www.amazon.com/gp/product/B00BK4W8TQ/ref=ppx_yo_dt_b_asin_title_o04_s03?ie=UTF8&psc=1)) into the enclosure with a 24v DC PoE+ splitter ([like this](https://www.amazon.com/gp/product/B07FHSSPR1/ref=ppx_yo_dt_b_asin_title_o04_s03?ie=UTF8&psc=1)) that powers the solenoid valve & an additional 24v->5v stepdown transformer ([like this](https://www.amazon.com/gp/product/B00J3MHT1E/ref=ppx_yo_dt_b_asin_title_o04_s02?ie=UTF8&psc=1)) for powering the Pi. This configuration doesn't require Wifi as the PoE connection also provides wired data access.
+
 *NOTE*: PoE (802.3af) might work for this configuration, but its cutting the power requirements pretty tight - standard PoE can provide 15.4W, which is close to the recommended limit for the Pi 3 of 12.5W or 15W for the Pi 4, without giving much additional ceiling for the valve solenoid.
 
 ![The assembled hardware](completed-assembly-2.png)
