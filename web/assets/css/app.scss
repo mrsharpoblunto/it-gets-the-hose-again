@@ -22,6 +22,25 @@ html,body,#app-container {
     height: 100%;
 }
 
+@supports(padding: max(0px)) {
+  #app-container {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+  .add-btn {
+    margin-right: max(0px, env(safe-area-inset-right));
+    margin-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+  .sidenav {
+    padding-top: max(0px, env(safe-area-inset-top)) !important;
+  }
+  .sidenav li {
+    padding-left: max(0px, env(safe-area-inset-left));
+  }
+}
+
 body {
     background-color: $bg-color;
     color: $bg-text-color;
@@ -39,6 +58,12 @@ nav .switch label {
     font-size: 1.0rem;
     margin-right: 16px;
 }
+
+.add-btn {
+  bottom: 24px;
+  right: 24px;
+}
+
 
 .refresh-btn {
     color: #fff;

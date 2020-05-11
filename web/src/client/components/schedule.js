@@ -136,7 +136,7 @@ export default function ScheduleComponent() {
         </div>
       )}
 
-      <div className="fixed-action-btn" style={{bottom: '24px', right: '24px'}}>
+      <div className="fixed-action-btn add-btn">
         <a
           {...tapOrClick(handleShowAdd)}
           className="btn-floating btn-large waves-effect waves-light">
