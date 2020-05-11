@@ -9,9 +9,10 @@ The controller software is built on Node.js with React.js powering a web UI fron
 
 [Hardware](hardware/README.md)
 ------------------------------
-The hardware consists of a small circuit to allow the Pi to control a 24vAC solenoid water valve such as [this one](http://www.amazon.com/gp/product/B00002N8NV), and a 3 LED status panel. DC water valves or valves using different voltages etc should also work with this control circuit, though this has not been tested.
+The hardware consists of a small circuit to allow the Pi to control a 24vAC/DC solenoid water valve such as [this one](http://www.amazon.com/gp/product/B00002N8NV), and a 3 LED status panel. Valves using different voltages etc should also work with this control circuit, though this has not been tested.
 
 Version 1: Powered by an AC connection into the enclosure & separate 5v and 24v DC adapters for the Pi and solenoid valve.
 ![The assembled hardware](completed-assembly.png)
 
-Version 2: Powered by a PoE+ connection into the enclosure with a 24v DC PoE+ splitter that powers the solenoid valve & an additional 24v->5v stepdown transformer for powering the Pi.
+Version 2: Powered by a PoE+ (power-over-ethernet 802.3at) connection (driven by an injector [like this](https://www.amazon.com/gp/product/B00BK4W8TQ/ref=ppx_yo_dt_b_asin_title_o04_s03?ie=UTF8&psc=1)) into the enclosure with a 24v DC PoE+ splitter ([like this](https://www.amazon.com/gp/product/B07FHSSPR1/ref=ppx_yo_dt_b_asin_title_o04_s03?ie=UTF8&psc=1)) that powers the solenoid valve & an additional 24v->5v stepdown transformer ([like this](https://www.amazon.com/gp/product/B00J3MHT1E/ref=ppx_yo_dt_b_asin_title_o04_s02?ie=UTF8&psc=1)) for powering the Pi.
+![The assembled hardware](completed-assembly-2.png)
