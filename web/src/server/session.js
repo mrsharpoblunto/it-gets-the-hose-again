@@ -1,7 +1,7 @@
 /**
  * @format
  */
-import uuid from 'node-uuid';
+import { v4 as uuidv4} from 'uuid';
 import * as config from './config';
 
 export function middleware(req, res, next) {
@@ -14,7 +14,7 @@ export function middleware(req, res, next) {
 }
 
 export function createSession(res) {
-    const id = uuid.v4();
+    const id = uuidv4();
     res.cookie(config.SESSION_COOKIE, id, {
         httpOnly: true,
         secure: config.APP_HTTPS,

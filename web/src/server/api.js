@@ -1,7 +1,7 @@
 /*
  * @format
  */
-import uuid from 'node-uuid';
+import { v4 as uuidv4 } from 'uuid';
 import fetch from 'node-fetch';
 import keys from '../../keys.json';
 import * as config from './config';
@@ -179,7 +179,7 @@ export default function (app) {
     }
 
     let newItem = {
-      id: uuid.v4(),
+      id: uuidv4(),
       duration: req.body.duration,
       time: req.body.time,
       frequency: req.body.frequency,
@@ -218,7 +218,9 @@ export default function (app) {
       const settings = await app.storage.getItem(config.SETTINGS_KEY);
       res.json({
         success: true,
-        settings: settings || getDefaultSettings(),
+        settings: {
+          ...(settings || getDefaultSettings()), 
+          homekitPin: keys.HOMEKIT_PINCODE},
       });
     } catch (err) {
       app.logger.error(`Unable to get settings - ${err.stack}`);

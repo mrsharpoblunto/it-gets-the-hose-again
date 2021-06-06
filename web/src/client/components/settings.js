@@ -153,7 +153,7 @@ export default function SettingsComponent() {
           <div className="input-field col s12">
             <label htmlFor="homekit-pin">HomeKit Pin</label>
             <input
-              value={keys.HOMEKIT_PINCODE}
+              value={settings.homekitPin}
               readOnly={true}
               id="homekit-pin"
               type="text"

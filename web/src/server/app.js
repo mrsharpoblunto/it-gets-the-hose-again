@@ -7,7 +7,7 @@ import https from 'https';
 import fs from 'fs';
 import storage from 'node-persist';
 import * as hap from 'hap-nodejs';
-import uuid from 'node-uuid';
+import {v4 as uuidv4} from 'uuid';
 
 import express from 'express';
 //express middleware
@@ -60,7 +60,7 @@ app.use(
   }),
 );
 
-app.use(cookieParser(uuid.v4()));
+app.use(cookieParser(uuidv4()));
 app.use(bodyParser.json());
 if (process.env.NODE_ENV !== 'production') {
   app.use(
