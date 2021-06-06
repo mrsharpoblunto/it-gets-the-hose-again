@@ -3,7 +3,6 @@
  */
 import React from 'react';
 import {useState, useEffect, useContext} from 'react';
-import tapOrClick from 'react-tap-or-click';
 
 import keys from '../../../keys.json';
 import {getSettings, updateSettings} from '../actions/settings';
@@ -210,7 +209,7 @@ export default function SettingsComponent() {
               {checkWeather ? (
                 <a
                   className="waves-effect weather-btn btn-flat right"
-                  {...tapOrClick(handleRefreshLocation)}>
+                  onClick={handleRefreshLocation}>
                   <i className="material-icons left">refresh</i> Refresh
                 </a>
               ) : null}

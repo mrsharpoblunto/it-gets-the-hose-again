@@ -3,7 +3,6 @@
  */
 import React from 'react';
 import {useState, useContext, useEffect} from 'react';
-import tapOrClick from 'react-tap-or-click';
 import {useHistory} from 'react-router-dom';
 import {login} from '../actions/auth';
 import Logo from './logo';
@@ -76,7 +75,7 @@ export default function LoginComponent() {
                   }
                   type="submit"
                   name="action"
-                  {...tapOrClick(handleLogin)}>
+                  onClick={handleLogin}>
                   {loading ? 'Logging in' : 'Login'}
                 </button>
               </div>

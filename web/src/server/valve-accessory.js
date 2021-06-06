@@ -7,7 +7,7 @@ import * as config from './config';
 export default function (valveController) {
   const valveUUID = hap.uuid.generate('hap-nodejs:accessories:valve');
 
-  const valve = new hap.Accessory('Water valve', valveUUID);
+  const valve = new hap.Accessory('Water valve'+ (process.env.NODE_ENV !== 'production' ? '-dev' : ''), valveUUID);
 
   valve
     .getService(hap.Service.AccessoryInformation)
@@ -21,7 +21,7 @@ export default function (valveController) {
   });
 
   valve
-    .addService(hap.Service.Switch, 'It gets the hose again')
+    .addService(hap.Service.Switch, 'It gets the hose again' + (process.env.NODE_ENV !== 'production' ? '-dev': ''))
     .getCharacteristic(hap.Characteristic.On)
     .on('set', function (value, cb) {
       valveController

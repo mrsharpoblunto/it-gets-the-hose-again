@@ -8006,11 +8006,6 @@ react-router@5.1.2:
     tiny-invariant "^1.0.2"
     tiny-warning "^1.0.0"
 
-react-tap-or-click@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/react-tap-or-click/-/react-tap-or-click-0.2.1.tgz#52c1d91a1e710ffeca6191f201d9c27dcf0a27fd"
-  integrity sha1-UsHZGh5xD/7KYZHyAdnCfc8KJ/0=
-
 react@^16.13.1, react@^16.7.0:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react/-/react-16.13.1.tgz#2e818822f1a9743122c063d6410d85c1e3afe48e"

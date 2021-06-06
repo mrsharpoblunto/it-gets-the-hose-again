@@ -1,7 +1,6 @@
 /*
  * @format
  */
-import tapOrClick from 'react-tap-or-click';
 import React from 'react';
 import {Route, Switch, useHistory} from 'react-router-dom';
 import {useRef, useLayoutEffect} from 'react';
@@ -53,7 +52,7 @@ export default function Main() {
             </a>
             <a
               href="#"
-              {...tapOrClick(handleShowSideNav)}
+              onClick={handleShowSideNav}
               className="left hide-on-large-only">
               <i style={{marginLeft: '8px'}} className="material-icons">
                 menu
@@ -61,17 +60,17 @@ export default function Main() {
             </a>
             <ul className="right hide-on-med-and-down">
               <li className={location.pathname === '/' ? 'active' : ''}>
-                <a {...tapOrClick(handleNav.bind(this, '/'))}>
+                <a onClick={handleNav.bind(this, '/')}>
                   <i className="material-icons">schedule</i>
                 </a>
               </li>
               <li className={location.pathname === '/history' ? 'active' : ''}>
-                <a {...tapOrClick(handleNav.bind(this, '/history'))}>
+                <a onClick={handleNav.bind(this, '/history')}>
                   <i className="material-icons">history</i>
                 </a>
               </li>
               <li className={location.pathname === '/settings' ? 'active' : ''}>
-                <a {...tapOrClick(handleNav.bind(this, '/settings'))}>
+                <a onClick={handleNav.bind(this, '/settings')}>
                   <i className="material-icons">settings</i>
                 </a>
               </li>
@@ -80,17 +79,17 @@ export default function Main() {
           </div>
           <ul ref={sideNav} className="sidenav">
             <li className={location.pathname === '/' ? 'active' : ''}>
-              <a {...tapOrClick(handleNav.bind(this, '/'))}>
+              <a onClick={handleNav.bind(this, '/')}>
                 <i className="material-icons left">schedule</i> Schedule
               </a>
             </li>
             <li className={location.pathname === '/history' ? 'active' : ''}>
-              <a {...tapOrClick(handleNav.bind(this, '/history'))}>
+              <a onClick={handleNav.bind(this, '/history')}>
                 <i className="material-icons left">history</i> History
               </a>
             </li>
             <li className={location.pathname === '/settings' ? 'active' : ''}>
-              <a {...tapOrClick(handleNav.bind(this, '/settings'))}>
+              <a onClick={handleNav.bind(this, '/settings')}>
                 <i className="material-icons left">settings</i> Settings
               </a>
             </li>

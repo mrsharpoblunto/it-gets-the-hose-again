@@ -4,7 +4,6 @@
 import React from 'react';
 import M from 'materialize-css';
 import {useContext, useLayoutEffect, useEffect, useRef} from 'react';
-import tapOrClick from 'react-tap-or-click';
 import {useHistory} from 'react-router-dom';
 import {
   getSchedule,
@@ -112,7 +111,7 @@ export default function ScheduleComponent() {
                     <td width="24">
                       <button
                         style={{padding: '0 8px'}}
-                        {...tapOrClick(handleDelete.bind(this, i.id))}
+                        onClick={handleDelete.bind(this, i.id)}
                         className="btn-flat delete-btn">
                         <i className="material-icons">delete</i>
                       </button>
@@ -138,7 +137,7 @@ export default function ScheduleComponent() {
 
       <div className="fixed-action-btn add-btn">
         <a
-          {...tapOrClick(handleShowAdd)}
+          onClick={handleShowAdd}
           className="btn-floating btn-large waves-effect waves-light">
           <i className="large material-icons">add</i>
         </a>
@@ -211,14 +210,16 @@ export default function ScheduleComponent() {
             className={
               'modal-action waves-effect btn-flat' + (adding ? ' disabled' : '')
             }
-            {...tapOrClick(handleCancel)}>
+            disabled={adding}
+            onClick={handleCancel}>
             Cancel
           </a>
           <a
             className={
               'modal-action waves-effect btn-flat' + (adding ? ' disabled' : '')
             }
-            {...tapOrClick(handleAdd)}>
+            disabled={adding}
+            onClick={handleAdd}>
             {adding ? 'Adding' : 'Add'}
           </a>
         </div>
