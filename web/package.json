@@ -21,7 +21,7 @@
     "express": "^4.17.1",
     "hap-nodejs": "^0.7.0",
     "morgan": "^1.10.0",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "node-persist": "^3.0.5",
     "onoff": "^6.0.0",
     "uuid": "^8.3.2",
